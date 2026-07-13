@@ -57,7 +57,6 @@ class PerformanceMonitor:
     def get_duration(self):
         end = datetime.now()
         duration_delta = end - self.start
-        # Return cleanly formatted total seconds string for the UI view
         return f"{duration_delta.total_seconds():.3f}s"
 
 
@@ -96,10 +95,11 @@ class ResumeReader:
 # ===============================================================
 
 class ResumeParser:
-    """Handles profile regex matching and entities tracking."""
+    """Handles profile regex matching, structural scanning, and entities tracking."""
     def __init__(self, resume_text):
         self.text = resume_text
         self.cleaned_text = ""
+        self.clean_text()
 
     def clean_text(self):
         text = self.text
@@ -121,35 +121,56 @@ class ResumeParser:
 
     def extract_name(self):
         if nlp and nlp.has_pipe("ner"):
-            doc = nlp(self.cleaned_text)
+            doc = nlp(self.cleaned_text[:1000])  # Scan initial chunk for names
             for entity in doc.ents:
                 if entity.label_ == "PERSON" and len(entity.text.split()) <= 4:
                     return entity.text
+        # String fallback rule engine for top lines
+        lines = [line.strip() for line in self.cleaned_text.split('\n') if line.strip()]
+        if lines:
+            return lines[0]
         return "Not Found"
 
     def extract_linkedin(self):
-        pattern = r'https?://(?:www\.)?linkedin\.com/in/[^\s]+|https?://(?:www\.)?linkedin\.com/[^\s]+'
+        pattern = r'https?://(?:www\.)?linkedin\.com/in/[^\s"\'\>]+|https?://(?:www\.)?linkedin\.com/[^\s"\'\>]+'
         result = re.findall(pattern, self.cleaned_text)
         return result[0] if result else "Not Found"
 
     def extract_github(self):
-        pattern = r'https?://(?:www\.)?github\.com/[^\s]+'
+        pattern = r'https?://(?:www\.)?github\.com/[^\s"\'\>]+'
         result = re.findall(pattern, self.cleaned_text)
         return result[0] if result else "Not Found"
 
+    def extract_dynamic_skills(self):
+        # Broad lexicon cross-reference dictionary for tech profiles
+        skill_db = [
+            "python", "java", "c++", "javascript", "typescript", "html", "css", "sql", 
+            "nosql", "git", "docker", "kubernetes", "aws", "gcp", "azure", "linux",
+            "flask", "django", "fastapi", "react", "vue", "angular", "node.js",
+            "pandas", "numpy", "scikit-learn", "tensorflow", "pytorch", "spacy",
+            "ci/cd", "rest api", "graphql", "agile", "scrum", "devops", "microservices"
+        ]
+        found_skills = []
+        lowered_text = self.cleaned_text.lower()
+        for skill in skill_db:
+            pattern = rf'\b{re.escape(skill)}\b'
+            if re.search(pattern, lowered_text):
+                found_skills.append(skill.upper())
+        return found_skills if found_skills else ["Python", "SQL", "Git", "HTML", "CSS"]
+
     def extract_all(self):
-        self.clean_text()
         return {
             "Name": self.extract_name(),
             "Email": self.extract_email(),
             "Phone": self.extract_phone(),
             "LinkedIn": self.extract_linkedin(),
-            "GitHub": self.extract_github()
+            "GitHub": self.extract_github(),
+            "Skills": self.extract_dynamic_skills()
         }
 
 
 class ATSEngine:
-    """Measures syntactic text overlays using vector cosine weights."""
+    """Measures syntactic text overlays using token extraction and vector cosine weights."""
     def __init__(self, resume_text, job_description):
         self.resume_text = resume_text.lower()
         self.job_description = job_description.strip() if job_description.strip() else "Software engineer Python developer"
@@ -178,9 +199,12 @@ class ATSEngine:
     def similarity_score(self):
         documents = [self.clean(self.resume_text), self.clean(self.job_description)]
         vectorizer = CountVectorizer()
-        matrix = vectorizer.fit_transform(documents)
-        similarity = cosine_similarity(matrix)[0][1]
-        return round(similarity * 100, 2)
+        try:
+            matrix = vectorizer.fit_transform(documents)
+            similarity = cosine_similarity(matrix)[0][1]
+            return round(similarity * 100, 2)
+        except Exception:
+            return 0.0
 
     def calculate_ats(self):
         keyword = self.keyword_match()
@@ -201,7 +225,7 @@ class ATSEngine:
 
 
 class CandidateEvaluator:
-    """Generates decision matrices using weighted profiling calculations."""
+    """Generates decision matrices using weighted profiling calculations across parsing matrices."""
     def __init__(self, analysis, ats_report):
         self.analysis = analysis
         self.ats = ats_report
@@ -219,9 +243,9 @@ class CandidateEvaluator:
         score = 0
         for item in education:
             item = item.lower()
-            if "phd" in item: score = max(score, 20)
-            elif "m.tech" in item or "m.e" in item or "master" in item: score = max(score, 18)
-            elif "b.tech" in item or "b.e" in item or "bachelor" in item: score = max(score, 16)
+            if "phd" in item or "doctorate" in item: score = max(score, 20)
+            elif "m.tech" in item or "m.e" in item or "master" in item or "m.s" in item: score = max(score, 18)
+            elif "b.tech" in item or "b.e" in item or "bachelor" in item or "b.s" in item: score = max(score, 16)
         return score if score > 0 else 12
 
     def project_score(self):
@@ -250,7 +274,7 @@ class CandidateEvaluator:
 
 
 # ===============================================================
-# WEB APPLICATION CONTROLLER ARCHITECTURE
+# PART 3: WEB APPLICATION CONTROLLER ARCHITECTURE
 # ===============================================================
 
 @app.route('/', methods=['GET', 'POST'])
@@ -279,11 +303,15 @@ def index():
             parser = ResumeParser(raw_text)
             details = parser.extract_all()
             
-            # Fallback data dictionary metrics mapping
+            # Context structural line validation pipeline fallbacks
+            parsed_lines = raw_text.splitlines()
+            edu_keywords = ["institute", "school", "university", "college", "degree", "bachelor", "master", "b.tech"]
+            proj_keywords = ["project", "developed", "system", "application", "built", "architecture"]
+            
             analysis = {
-                "Education": [line.strip() for line in raw_text.splitlines() if any(k in line for k in ["Institute", "School", "University", "College"])][:4],
-                "Projects": [line.strip() for line in raw_text.splitlines() if any(k in line for k in ["Project", "Developed", "System", "Application"])][:4],
-                "Technical Skills": ["C", "Java", "Python", "HTML", "CSS", "SQL", "Git", "Data Structures"]
+                "Education": [line.strip() for line in parsed_lines if any(k in line.lower() for k in edu_keywords)][:4],
+                "Projects": [line.strip() for line in parsed_lines if any(k in line.lower() for k in proj_keywords)][:4],
+                "Technical Skills": details["Skills"]
             }
             
             # Phase 3: Text score matching algorithms execution
@@ -299,31 +327,58 @@ def index():
             logging.info(f"Screening Run Completed successfully in {duration_str}")
 
             # THREAD-SAFE FIX: Create isolated standalone Figure instance instead of mutating global plt
-            fig = Figure(figsize=(5, 3.5))
+            fig = Figure(figsize=(6, 4))
             ax = fig.subplots()
             
-            labels = ["Resume Base", "ATS Match", "Composite"]
+            labels = ["Resume Engine", "ATS Match", "Composite Overlap"]
             values = [evaluation["Resume Score"], evaluation["ATS Score"], evaluation["Overall Score"]]
+            colors = ['#4F46E5', '#10B981', '#F59E0B']
             
-            ax.bar(labels, values, color=['#6366F1', '#10B981', '#F59E0B'])
+            ax.bar(labels, values, color=colors, width=0.5)
             ax.set_ylim(0, 100)
-            ax.set_title("Metrics Breakdown Vector", fontsize=10)
+            ax.set_ylabel('Percentage Weighted Value')
+            ax.set_title("Metrics Breakdown Analysis Profile", fontsize=11, fontweight='bold', pad=15)
             
-            # Save out from target buffer stream
+            # Clean up plot styling programmatically
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.grid(axis='y', linestyle='--', alpha=0.5)
+            
+            # Save out to target in-memory buffer stream
             img_buf = io.BytesIO()
-            fig.savefig(img_buf, format='png', bbox_inches='tight')
+            fig.savefig(img_buf, format='png', bbox_inches='tight', dpi=150)
             img_buf.seek(0)
             plot_url = base64.b64encode(img_buf.getvalue()).decode('utf-8')
 
-            return render_template('results.html', details=details, evaluation=evaluation, plot_url=plot_url, execution_time=duration_str)
+            return render_template(
+                'results.html', 
+                details=details, 
+                evaluation=evaluation, 
+                plot_url=plot_url, 
+                execution_time=duration_str,
+                analysis=analysis
+            )
 
         except Exception as e:
-            logging.error(f"Processing Pipeline Fault: {str(e)}")
-            flash(f"System processing error occurred: {str(e)}")
+            logging.error(f"Processing Pipeline Fault Exception Raised: {str(e)}")
+            flash(f"System processing error encountered: {str(e)}")
             return redirect(request.url)
 
     return render_template('index.html')
 
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """System health check checkpoint probe for container configurations."""
+    return json.dumps({
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "nlp_engine_loaded": nlp is not None,
+        "environment": os.environ.get("FLASK_ENV", "production")
+    }), 200, {'Content-Type': 'application/json'}
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    # Standard application loop invocation handling production bindings
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
