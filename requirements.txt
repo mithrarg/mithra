@@ -9,3 +9,4 @@ spacy
 scikit-learn
 matplotlib
 gunicorn
+flask
