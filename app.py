@@ -1,384 +1,125 @@
-import os
-import re
-import sys
-import json
-import logging
-import io
-import base64
+import os, re, io, base64, logging, spacy, pdfplumber, docx
 from datetime import datetime
-
-import pdfplumber
-import docx
-import pandas as pd
-import numpy as np
-import spacy
-import matplotlib
-
-# Force non-interactive matplotlib backend for headless server deployment on Render
-matplotlib.use('Agg')
-from matplotlib.figure import Figure  # Use Object-Oriented approach for thread safety
-
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, flash
+from matplotlib.figure import Figure
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Initialize Flask App Config
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "prod-screening-system-token-9988")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# Setup System Infrastructure Logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-# Robust spaCy NLP Pipeline Model Initialization
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
-    try:
-        nlp = spacy.blank("en")
-    except Exception:
-        nlp = None
+    nlp = spacy.blank("en") if spacy else None
 
-if nlp is None:
-    logging.warning("System Notice: spaCy pipeline fallback in effect. Using basic token parsing.")
+class ResumeParserEngine:
+    def extract_text(self, file):
+        fn = file.filename.lower()
+        stream = io.BytesIO(file.read())
+        if fn.endswith(".pdf"):
+            with pdfplumber.open(stream) as pdf:
+                return "".join([p.extract_text() or "" for p in pdf.pages])
+        elif fn.endswith((".docx", ".doc")):
+            return "".join([p.text + "\n" for p in docx.Document(stream).paragraphs])
+        raise ValueError("Unsupported format. Use PDF or DOCX.")
 
-
-# ===============================================================
-# PART 1: IN-MEMORY EXTRACTION & INPUT INFRASTRUCTURE
-# ===============================================================
-
-class PerformanceMonitor:
-    """Tracks atomic compute durations within standard request lifetimes."""
-    def __init__(self):
-        self.start = datetime.now()
-
-    def get_duration(self):
-        end = datetime.now()
-        duration_delta = end - self.start
-        return f"{duration_delta.total_seconds():.3f}s"
-
-
-class ResumeReader:
-    """Parses structural document content from ephemeral input streams."""
-    def read_pdf(self, file_stream):
-        text = ""
-        with pdfplumber.open(file_stream) as pdf:
-            for page in pdf.pages:
-                page_text = page.extract_text()
-                if page_text:
-                    text += page_text + "\n"
-        return text
-
-    def read_docx(self, file_stream):
-        doc = docx.Document(file_stream)
-        text = ""
-        for para in doc.paragraphs:
-            text += para.text + "\n"
-        return text
-
-    def extract_text(self, file_storage):
-        filename = file_storage.filename.lower()
-        file_stream = io.BytesIO(file_storage.read())
+    def parse_profile(self, text):
+        clean = re.sub(r'\s+', ' ', text).strip()
+        email = re.findall(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}', clean)
+        phone = re.findall(r'(\+?\d[\d\s\-]{8,15}\d)', clean)
+        lnk = re.findall(r'https?://(?:www\.)?linkedin\.com/[^\s"\'\>]+', clean)
+        git = re.findall(r'https?://(?:www\.)?github\.com/[^\s"\'\>]+', clean)
         
-        if filename.endswith(".pdf"):
-            return self.read_pdf(file_stream)
-        elif filename.endswith((".docx", ".doc")):
-            return self.read_docx(file_stream)
-        else:
-            raise ValueError("Unsupported file extension. Please upload a PDF or DOCX format document.")
-
-
-# ===============================================================
-# PART 2: LEXICAL ENGINE, ATS ANALYSIS & CANDIDATE METRICS
-# ===============================================================
-
-class ResumeParser:
-    """Handles profile regex matching, structural scanning, and entities tracking."""
-    def __init__(self, resume_text):
-        self.text = resume_text
-        self.cleaned_text = ""
-        self.clean_text()
-
-    def clean_text(self):
-        text = self.text
-        text = re.sub(r'\n+', '\n', text)
-        text = re.sub(r'\t+', ' ', text)
-        text = re.sub(r' +', ' ', text)
-        self.cleaned_text = text.strip()
-        return self.cleaned_text
-
-    def extract_email(self):
-        pattern = r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
-        emails = re.findall(pattern, self.cleaned_text)
-        return emails[0] if emails else "Not Found"
-
-    def extract_phone(self):
-        pattern = r'(\+?\d[\d\s\-]{8,15}\d)'
-        phones = re.findall(pattern, self.cleaned_text)
-        return phones[0] if phones else "Not Found"
-
-    def extract_name(self):
+        name = "Not Found"
         if nlp and nlp.has_pipe("ner"):
-            doc = nlp(self.cleaned_text[:1000])  # Scan initial chunk for names
-            for entity in doc.ents:
-                if entity.label_ == "PERSON" and len(entity.text.split()) <= 4:
-                    return entity.text
-        # String fallback rule engine for top lines
-        lines = [line.strip() for line in self.cleaned_text.split('\n') if line.strip()]
-        if lines:
-            return lines[0]
-        return "Not Found"
+            for ent in nlp(clean[:1000]).ents:
+                if ent.label_ == "PERSON" and len(ent.text.split()) <= 4:
+                    name = ent.text; break
+        if name == "Not Found" and text.splitlines():
+            name = text.splitlines()[0].strip()
 
-    def extract_linkedin(self):
-        pattern = r'https?://(?:www\.)?linkedin\.com/in/[^\s"\'\>]+|https?://(?:www\.)?linkedin\.com/[^\s"\'\>]+'
-        result = re.findall(pattern, self.cleaned_text)
-        return result[0] if result else "Not Found"
-
-    def extract_github(self):
-        pattern = r'https?://(?:www\.)?github\.com/[^\s"\'\>]+'
-        result = re.findall(pattern, self.cleaned_text)
-        return result[0] if result else "Not Found"
-
-    def extract_dynamic_skills(self):
-        # Broad lexicon cross-reference dictionary for tech profiles
-        skill_db = [
-            "python", "java", "c++", "javascript", "typescript", "html", "css", "sql", 
-            "nosql", "git", "docker", "kubernetes", "aws", "gcp", "azure", "linux",
-            "flask", "django", "fastapi", "react", "vue", "angular", "node.js",
-            "pandas", "numpy", "scikit-learn", "tensorflow", "pytorch", "spacy",
-            "ci/cd", "rest api", "graphql", "agile", "scrum", "devops", "microservices"
-        ]
-        found_skills = []
-        lowered_text = self.cleaned_text.lower()
-        for skill in skill_db:
-            pattern = rf'\b{re.escape(skill)}\b'
-            if re.search(pattern, lowered_text):
-                found_skills.append(skill.upper())
-        return found_skills if found_skills else ["Python", "SQL", "Git", "HTML", "CSS"]
-
-    def extract_all(self):
-        return {
-            "Name": self.extract_name(),
-            "Email": self.extract_email(),
-            "Phone": self.extract_phone(),
-            "LinkedIn": self.extract_linkedin(),
-            "GitHub": self.extract_github(),
-            "Skills": self.extract_dynamic_skills()
-        }
-
+        skills = ["PYTHON", "JAVA", "C++", "JAVASCRIPT", "SQL", "GIT", "DOCKER", "AWS", "FLASK", "REACT", "LINUX"]
+        found_skills = [s for s in skills if re.search(rf'\b{s}\b', clean.upper())]
+        return {"Name": name, "Email": email[0] if email else "Not Found", "Phone": phone[0] if phone else "Not Found",
+                "LinkedIn": lnk[0] if lnk else "Not Found", "GitHub": git[0] if git else "Not Found", "Skills": found_skills or ["PYTHON", "SQL"]}
 
 class ATSEngine:
-    """Measures syntactic text overlays using token extraction and vector cosine weights."""
-    def __init__(self, resume_text, job_description):
-        self.resume_text = resume_text.lower()
-        self.job_description = job_description.strip() if job_description.strip() else "Software engineer Python developer"
+    def __init__(self, resume, jd):
+        self.r_text = re.sub(r'[^a-z0-9 ]', ' ', resume.lower())
+        self.jd_text = re.sub(r'[^a-z0-9 ]', ' ', (jd or "Software engineer Python developer").lower())
 
-    def clean(self, text):
-        text = text.lower()
-        text = re.sub(r'[^a-zA-Z0-9 ]', ' ', text)
-        text = re.sub(r'\s+', ' ', text)
-        return text
+    def get_tokens(self, text):
+        if nlp: return list(set([t.lemma_ for t in nlp(text) if not t.is_stop and len(t.text) > 2]))
+        return list(set([w for w in text.split() if len(w) > 2]))
 
-    def extract_keywords(self, text):
-        if nlp:
-            doc = nlp(self.clean(text))
-            keywords = [token.lemma_ for token in doc if not token.is_stop and not token.is_punct and len(token.text) > 2]
-            return list(set(keywords))
-        return list(set(self.clean(text).split()))
-
-    def keyword_match(self):
-        resume_keywords = self.extract_keywords(self.resume_text)
-        jd_keywords = self.extract_keywords(self.job_description)
-        matched = [word for word in jd_keywords if word in resume_keywords]
-        missing = [word for word in jd_keywords if word not in resume_keywords]
-        percentage = (len(matched) / len(jd_keywords)) * 100 if jd_keywords else 0
-        return {"Matched": sorted(matched), "Missing": sorted(missing), "Percentage": round(percentage, 2)}
-
-    def similarity_score(self):
-        documents = [self.clean(self.resume_text), self.clean(self.job_description)]
-        vectorizer = CountVectorizer()
-        try:
-            matrix = vectorizer.fit_transform(documents)
-            similarity = cosine_similarity(matrix)[0][1]
-            return round(similarity * 100, 2)
-        except Exception:
-            return 0.0
-
-    def calculate_ats(self):
-        keyword = self.keyword_match()
-        similarity = self.similarity_score()
-        return round((keyword["Percentage"] * 0.6) + (similarity * 0.4), 2)
-
-    def generate_report(self):
-        keyword = self.keyword_match()
-        similarity = self.similarity_score()
-        ats = self.calculate_ats()
-        return {
-            "Keyword Match (%)": keyword["Percentage"],
-            "Cosine Similarity (%)": similarity,
-            "ATS Score": ats,
-            "Matched Keywords": keyword["Matched"],
-            "Missing Keywords": keyword["Missing"]
-        }
-
-
-class CandidateEvaluator:
-    """Generates decision matrices using weighted profiling calculations across parsing matrices."""
-    def __init__(self, analysis, ats_report):
-        self.analysis = analysis
-        self.ats = ats_report
-
-    def skill_score(self):
-        skills = len(self.analysis.get("Technical Skills", []))
-        if skills >= 15: return 30
-        elif skills >= 10: return 25
-        elif skills >= 7: return 20
-        elif skills >= 5: return 15
-        return 5
-
-    def education_score(self):
-        education = self.analysis.get("Education", [])
-        score = 0
-        for item in education:
-            item = item.lower()
-            if "phd" in item or "doctorate" in item: score = max(score, 20)
-            elif "m.tech" in item or "m.e" in item or "master" in item or "m.s" in item: score = max(score, 18)
-            elif "b.tech" in item or "b.e" in item or "bachelor" in item or "b.s" in item: score = max(score, 16)
-        return score if score > 0 else 12
-
-    def project_score(self):
-        count = len(self.analysis.get("Projects", []))
-        if count >= 5: return 15
-        elif count >= 3: return 12
-        return 10
-
-    def evaluate(self):
-        resume_score = self.skill_score() + self.education_score() + self.project_score()
-        ats_score = self.ats["ATS Score"]
-        overall = round((ats_score * 0.60) + (resume_score * 0.40), 2)
+    def analyze(self):
+        r_tok, jd_tok = self.get_tokens(self.r_text), self.get_tokens(self.jd_text)
+        matched = [w for w in jd_tok if w in r_tok]
+        match_pct = (len(matched) / len(jd_tok)) * 100 if jd_tok else 0
         
-        if overall >= 85: status = "SELECTED"
-        elif overall >= 70: status = "SHORTLISTED"
-        elif overall >= 55: status = "MAYBE"
-        else: status = "REJECTED"
+        try:
+            matrix = CountVectorizer().fit_transform([self.r_text, self.jd_text])
+            sim_score = cosine_similarity(matrix)[0][1] * 100
+        except: sim_score = 0
+        
+        ats = round((match_pct * 0.6) + (sim_score * 0.4), 2)
+        return {"ATS Score": ats, "Matched": matched, "Missing": [w for w in jd_tok if w not in r_tok]}
 
-        return {
-            "Resume Score": resume_score,
-            "ATS Score": ats_score,
-            "Overall Score": overall,
-            "Decision": status,
-            "Missing Skills": self.ats["Missing Keywords"]
-        }
-
-
-# ===============================================================
-# PART 3: WEB APPLICATION CONTROLLER ARCHITECTURE
-# ===============================================================
+def evaluate_candidate(raw_text, profile, ats_report):
+    lines = raw_text.splitlines()
+    edu = [l.strip() for l in lines if any(k in l.lower() for k in ["university", "college", "degree", "bachelor", "master"])][:4]
+    proj = [l.strip() for l in lines if any(k in l.lower() for k in ["project", "developed", "system", "built"])][:4]
+    
+    s_score = min(30, max(5, len(profile["Skills"]) * 3))
+    e_score = 12
+    for item in [e.lower() for e in edu]:
+        if "phd" in item: e_score = 20; break
+        elif any(k in item for k in ["master", "m.tech", "m.s"]): e_score = 18; break
+        elif any(k in item for k in ["bachelor", "b.tech", "b.e"]): e_score = 16; break
+            
+    p_score = 15 if len(proj) >= 4 else (12 if len(proj) >= 2 else 10)
+    r_score = s_score + e_score + p_score
+    overall = round((ats_report["ATS Score"] * 0.6) + (r_score * 0.4), 2)
+    
+    status = "SELECTED" if overall >= 85 else ("SHORTLISTED" if overall >= 70 else ("MAYBE" if overall >= 55 else "REJECTED"))
+    return {"Resume Score": r_score, "ATS Score": ats_report["ATS Score"], "Overall Score": overall, "Decision": status, "Education": edu, "Projects": proj}
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        if 'resume' not in request.files:
-            flash('Processing Failure: No upload wrapper element detected.')
+        if 'resume' not in request.files or request.files['resume'].filename == '':
+            flash('Processing Failure: Invalid upload boundary file.')
             return redirect(request.url)
-            
-        file = request.files['resume']
-        jd_text = request.form.get('job_description', '')
-
-        if file.filename == '':
-            flash('Processing Failure: Target filename validation boundary failed.')
-            return redirect(request.url)
-
         try:
-            # Initialize compute tracking monitoring metrics
-            monitor = PerformanceMonitor()
+            start = datetime.now()
+            file = request.files['resume']
             
-            # Phase 1: Stream extraction logic execution
-            reader = ResumeReader()
-            raw_text = reader.extract_text(file)
+            engine = ResumeParserEngine()
+            raw_text = engine.extract_text(file)
+            profile = engine.parse_profile(raw_text)
             
-            # Phase 2: Lexical profile analysis mapping
-            parser = ResumeParser(raw_text)
-            details = parser.extract_all()
+            ats_report = ATSEngine(raw_text, request.form.get('job_description', '')).analyze()
+            eval_res = evaluate_candidate(raw_text, profile, ats_report)
+            duration = f"{(datetime.now() - start).total_seconds():.3f}s"
             
-            # Context structural line validation pipeline fallbacks
-            parsed_lines = raw_text.splitlines()
-            edu_keywords = ["institute", "school", "university", "college", "degree", "bachelor", "master", "b.tech"]
-            proj_keywords = ["project", "developed", "system", "application", "built", "architecture"]
-            
-            analysis = {
-                "Education": [line.strip() for line in parsed_lines if any(k in line.lower() for k in edu_keywords)][:4],
-                "Projects": [line.strip() for line in parsed_lines if any(k in line.lower() for k in proj_keywords)][:4],
-                "Technical Skills": details["Skills"]
-            }
-            
-            # Phase 3: Text score matching algorithms execution
-            ats_engine = ATSEngine(raw_text, jd_text)
-            report = ats_engine.generate_report()
-            
-            # Phase 4: Final candidate decision calculation
-            evaluator = CandidateEvaluator(analysis, report)
-            evaluation = evaluator.evaluate()
-            
-            # Capture total computational latency duration
-            duration_str = monitor.get_duration()
-            logging.info(f"Screening Run Completed successfully in {duration_str}")
-
-            # THREAD-SAFE FIX: Create isolated standalone Figure instance instead of mutating global plt
-            fig = Figure(figsize=(6, 4))
+            fig = Figure(figsize=(5, 3.5))
             ax = fig.subplots()
-            
-            labels = ["Resume Engine", "ATS Match", "Composite Overlap"]
-            values = [evaluation["Resume Score"], evaluation["ATS Score"], evaluation["Overall Score"]]
-            colors = ['#4F46E5', '#10B981', '#F59E0B']
-            
-            ax.bar(labels, values, color=colors, width=0.5)
+            ax.bar(["Resume", "ATS", "Overall"], [eval_res["Resume Score"], eval_res["ATS Score"], eval_res["Overall Score"]], color=['#6366F1', '#10B981', '#F59E0B'])
             ax.set_ylim(0, 100)
-            ax.set_ylabel('Percentage Weighted Value')
-            ax.set_title("Metrics Breakdown Analysis Profile", fontsize=11, fontweight='bold', pad=15)
+            ax.set_title("Metrics Profile Breakdown")
             
-            # Clean up plot styling programmatically
-            ax.spines['top'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            ax.grid(axis='y', linestyle='--', alpha=0.5)
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png', bbox_inches='tight')
+            plot_url = base64.b64encode(buf.getvalue()).decode('utf-8')
             
-            # Save out to target in-memory buffer stream
-            img_buf = io.BytesIO()
-            fig.savefig(img_buf, format='png', bbox_inches='tight', dpi=150)
-            img_buf.seek(0)
-            plot_url = base64.b64encode(img_buf.getvalue()).decode('utf-8')
-
-            return render_template(
-                'results.html', 
-                details=details, 
-                evaluation=evaluation, 
-                plot_url=plot_url, 
-                execution_time=duration_str,
-                analysis=analysis
-            )
-
+            return render_template('results.html', details=profile, evaluation=eval_res, plot_url=plot_url, execution_time=duration)
         except Exception as e:
-            logging.error(f"Processing Pipeline Fault Exception Raised: {str(e)}")
-            flash(f"System processing error encountered: {str(e)}")
+            logging.error(f"Pipeline Fault: {str(e)}")
+            flash(f"System error: {str(e)}")
             return redirect(request.url)
-
     return render_template('index.html')
 
-
-@app.route('/health', methods=['GET'])
-def health_check():
-    """System health check checkpoint probe for container configurations."""
-    return json.dumps({
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "nlp_engine_loaded": nlp is not None,
-        "environment": os.environ.get("FLASK_ENV", "production")
-    }), 200, {'Content-Type': 'application/json'}
-
-
 if __name__ == "__main__":
-    # Standard application loop invocation handling production bindings
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
