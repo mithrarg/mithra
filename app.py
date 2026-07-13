@@ -16,7 +16,7 @@ import matplotlib
 
 # Force non-interactive matplotlib backend for headless server deployment on Render
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure  # Use Object-Oriented approach for thread safety
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 from sklearn.feature_extraction.text import CountVectorizer
@@ -56,7 +56,9 @@ class PerformanceMonitor:
 
     def get_duration(self):
         end = datetime.now()
-        return end - self.start
+        duration_delta = end - self.start
+        # Return cleanly formatted total seconds string for the UI view
+        return f"{duration_delta.total_seconds():.3f}s"
 
 
 class ResumeReader:
@@ -118,7 +120,7 @@ class ResumeParser:
         return phones[0] if phones else "Not Found"
 
     def extract_name(self):
-        if nlp:
+        if nlp and nlp.has_pipe("ner"):
             doc = nlp(self.cleaned_text)
             for entity in doc.ents:
                 if entity.label_ == "PERSON" and len(entity.text.split()) <= 4:
@@ -293,24 +295,27 @@ def index():
             evaluation = evaluator.evaluate()
             
             # Capture total computational latency duration
-            duration = monitor.get_duration()
-            logging.info(f"Screening Run Completed successfully in {duration}")
+            duration_str = monitor.get_duration()
+            logging.info(f"Screening Run Completed successfully in {duration_str}")
 
-            # Plot Analysis Generation inside Headless RAM Buffer
-            plt.figure(figsize=(5, 3.5))
+            # THREAD-SAFE FIX: Create isolated standalone Figure instance instead of mutating global plt
+            fig = Figure(figsize=(5, 3.5))
+            ax = fig.subplots()
+            
             labels = ["Resume Base", "ATS Match", "Composite"]
             values = [evaluation["Resume Score"], evaluation["ATS Score"], evaluation["Overall Score"]]
-            plt.bar(labels, values, color=['#6366F1', '#10B981', '#F59E0B'])
-            plt.ylim(0, 100)
-            plt.title("Metrics Breakdown Vector", fontsize=10)
             
+            ax.bar(labels, values, color=['#6366F1', '#10B981', '#F59E0B'])
+            ax.set_ylim(0, 100)
+            ax.set_title("Metrics Breakdown Vector", fontsize=10)
+            
+            # Save out from target buffer stream
             img_buf = io.BytesIO()
-            plt.savefig(img_buf, format='png', bbox_inches='tight')
+            fig.savefig(img_buf, format='png', bbox_inches='tight')
             img_buf.seek(0)
             plot_url = base64.b64encode(img_buf.getvalue()).decode('utf-8')
-            plt.close()
 
-            return render_template('results.html', details=details, evaluation=evaluation, plot_url=plot_url, execution_time=duration)
+            return render_template('results.html', details=details, evaluation=evaluation, plot_url=plot_url, execution_time=duration_str)
 
         except Exception as e:
             logging.error(f"Processing Pipeline Fault: {str(e)}")
