@@ -8,3 +8,4 @@ numpy
 spacy
 scikit-learn
 matplotlib
+gunicorn
