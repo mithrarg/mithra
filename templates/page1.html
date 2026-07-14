@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Screening System - Vibrant Pink Edition</title>
+    <style>
+        :root {
+            /* Vibrant hot pink palette matching your reference image */
+            --bg-berry: linear-gradient(145deg, #e92c64 0%, #ce1b50 100%);
+            --text-dark: #ffffff; 
+            --text-light-pink: #ffb3c6;
+            --clay-surface: #ffffff;
+            --clay-dark-pink: #e92c64;
+            --clay-shadow-dark: #b81745;
+            --dark-lens-rim: #33343a;
+            --inner-glow: rgba(255, 255, 255, 0.9);
+            
+            /* Enhanced 3D shadows optimized for a rich background */
+            --perfect-note-shadow: 
+                -12px 20px 30px rgba(138, 12, 48, 0.3),
+                -25px 45px 65px rgba(138, 12, 48, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Smartphone UI Frame Container with clear normal outer phone borders */
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: var(--bg-berry);
+            border-radius: 44px;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.2), 0 0 0 12px #33343a;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 28px;
+            justify-content: space-between;
+        }
+
+        /* Top Bar Status System */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 0 10px;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .icon-signal { width: 18px; height: 10px; border-bottom: 3px solid var(--text-dark); border-right: 3px solid var(--text-dark); transform: scaleY(0.75); }
+        .icon-wifi { font-size: 13px; }
+        .icon-battery { width: 22px; height: 11px; border: 1.5px solid var(--text-dark); border-radius: 3px; position: relative; }
+        .icon-battery::after { content: ''; position: absolute; right: 2px; top: 1.5px; width: 13px; height: 5px; background: var(--text-dark); }
+
+        /* Typography Headline Text Layout */
+        .heading-section {
+            margin-top: 24px;
+            padding-left: 4px;
+        }
+
+        .welcome-label {
+            color: var(--text-light-pink);
+            font-size: 19px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .main-title {
+            color: var(--text-dark);
+            font-size: 44px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-light-pink);
+            font-size: 17px;
+            line-height: 1.45;
+            font-weight: 500;
+        }
+
+        /* 3D Scene Viewport Canvas */
+        .scene-wrapper {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            margin: 15px 0;
+            perspective: 1200px;
+        }
+
+        /* 3D Main Note */
+        .document-note-3d {
+            position: absolute;
+            width: 195px;
+            height: 255px;
+            top: 50%;
+            left: 52%;
+            transform: translate(-50%, -50%) rotateX(15deg) rotateY(-12deg) rotateZ(3deg);
+            background: var(--clay-shadow-dark);
+            border-radius: 26px;
+            box-shadow: var(--perfect-note-shadow);
+            z-index: 5;
+            transition: transform 0.5s ease;
+        }
+
+        /* Dynamic 3D Bevel Extrusion for the Note Layer Thickness */
+        .document-note-3d::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 5px;
+            right: -6px;
+            background: #a0103a;
+            border-radius: 26px;
+            z-index: -1;
+        }
+
+        /* Clean Claymorphic Top Surface Layer of Note */
+        .note-top-surface {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: -4px;
+            left: -2px;
+            background: var(--clay-surface);
+            border-radius: 26px;
+            padding: 22px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 
+                inset 3px -3px 8px rgba(0,0,0,0.02),
+                inset -3px 3px 8px var(--inner-glow),
+                0 0 0 2px #ffb3c6;
+        }
+
+        /* Inner Header Profile Badge Component */
+        .note-profile-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .inner-circle-avatar {
+            width: 54px;
+            height: 54px;
+            background: #e92c64;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: inset -2px -2px 5px rgba(0,0,0,0.15), inset 2px 2px 5px rgba(255,255,255,0.3);
+        }
+
+        /* Inner Person Silhouette Icon Graphics */
+        .inner-circle-avatar::before {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: var(--clay-surface);
+            border-radius: 50%;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .inner-circle-avatar::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 12px;
+            background: var(--clay-surface);
+            border-radius: 12px 12px 0 0;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Profile Layout Horizontal Info Skeleton Lines */
+        .skeleton-header-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex-grow: 1;
+        }
+
+        .sk-line {
+            height: 6px;
+            background: #ffcbd5;
+            border-radius: 3px;
+        }
+        .sk-line.w1 { width: 50px; }
+        .sk-line.w2 { width: 75px; }
+        .sk-line.w3 { width: 40px; }
+
+        /* Bottom Section Lines of Note */
+        .note-body-skeleton {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .sk-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sk-dot {
+            width: 6px;
+            height: 6px;
+            background: #e92c64;
+            border-radius: 50%;
+        }
+
+        .sk-body-bar {
+            height: 6px;
+            background: #ffcbd5;
+            border-radius: 3px;
+            width: 80px;
+        }
+
+        /* 3D Added File Box */
+        .added-file-box-3d {
+            position: absolute;
+            left: 10px;
+            top: 52%;
+            width: 65px;
+            height: 52px;
+            background: var(--clay-surface);
+            border-radius: 12px;
+            transform: rotateX(15deg) rotateY(15deg) rotateZ(-4deg);
+            box-shadow: -10px 15px 25px rgba(0, 0, 0, 0.15), inset -2px -2px 5px rgba(0,0,0,0.03), 0 0 0 2px #ffcbd5;
+            z-index: 3;
+        }
+
+        .added-file-box-3d::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 8px;
+            width: 24px;
+            height: 6px;
+            background: #ffcbd5;
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Files Container populated with custom data elements */
+        .files-nest {
+            position: absolute;
+            top: -26px;
+            left: 8px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .perfect-long-file {
+            width: 17px;
+            height: 44px;
+            background: #ff758f;
+            border-radius: 3px;
+            padding: 5px 2px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            box-shadow: -3px 4px 6px rgba(0,0,0,0.08);
+        }
+
+        .perfect-long-file.tall {
+            height: 50px;
+            transform: translateY(-6px) rotate(3deg);
+            background: #e92c64;
+        }
+
+        /* File inner contents */
+        .file-mini-avatar {
+            width: 7px;
+            height: 7px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin: 0 auto 1px auto;
+        }
+
+        .file-stripe {
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 1px;
+        }
+        .file-stripe.short { width: 70%; }
+
+        /* Small Box Located Directly BELOW the File Box */
+        .small-box-two-persons {
+            position: absolute;
+            left: 30px;
+            bottom: 45px;
+            width: 52px;
+            height: 52px;
+            background: var(--clay-surface);
+            border-radius: 14px;
+            transform: rotateX(12deg) rotateY(-8deg) translateZ(30px);
+            box-shadow: -8px 12px 22px rgba(0, 0, 0, 0.15), inset -2px -2px 4px rgba(0,0,0,0.03), inset 2px 2px 4px var(--inner-glow), 0 0 0 2px #ffcbd5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 6;
+            transition: transform 0.5s ease;
+        }
+
+        /* Two Persons Graphical Icons */
+        .two-persons-graphics {
+            position: relative;
+            width: 32px;
+            height: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .avatar-node {
+            width: 12px;
+            height: 12px;
+            background: #e92c64;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .avatar-node::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: -3px;
+            width: 18px;
+            height: 8px;
+            background: #e92c64;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .avatar-node.lead {
+            left: 2px;
+            z-index: 2;
+            box-shadow: 1px 0 3px rgba(0,0,0,0.05);
+        }
+
+        .avatar-node.follow {
+            right: 2px;
+            background: #ffccd5;
+            transform: scale(0.85);
+            z-index: 1;
+        }
+        .avatar-node.follow::after { background: #ffccd5; }
+
+        /* Upper Right Corner Modular Tiny Floating Box Widget */
+        .upper-right-widget {
+            position: absolute;
+            right: 22px;
+            top: 50px;
+            width: 54px;
+            height: 54px;
+            background: var(--clay-surface);
+            border-radius: 14px;
+            transform: rotateX(10deg) rotateY(-15deg) rotateZ(6deg) translateZ(20px);
+            box-shadow: 8px 12px 20px rgba(0, 0, 0, 0.15), inset -2px -2px 4px rgba(0,0,0,0.03), 0 0 0 2px #ffcbd5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 6;
+        }
+
+        .mini-chart-graphics {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+        }
+
+        .chart-bar {
+            width: 5px;
+            background: #e92c64;
+            border-radius: 1.5px;
+        }
+        .chart-bar.c1 { height: 10px; }
+        .chart-bar.c2 { height: 20px; }
+        .chart-bar.c3 { height: 14px; }
+
+        /* Magnifying Glass Lens Graphics */
+        .lens-graphics-container {
+            position: absolute;
+            right: 25px;
+            bottom: 60px;
+            width: 130px;
+            height: 130px;
+            z-index: 10;
+            pointer-events: none;
+            transform: translateZ(45px) rotateX(15deg) rotateY(-12deg) rotateZ(3deg);
+            transition: transform 0.5s ease;
+        }
+
+        /* 3D Lens Rim Frame with Lighter Ambient Shadow */
+        .magnifying-lens-rim {
+            width: 86px;
+            height: 86px;
+            border: 11px solid var(--dark-lens-rim);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(3px);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-shadow: 
+                -8px 14px 22px rgba(0, 0, 0, 0.15), 
+                inset -4px 4px 6px rgba(255,255,255,0.35),
+                inset 4px -4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Pink Checkmark Graphics inside Glass Circle */
+        .lens-inner-checkmark {
+            width: 14px;
+            height: 24px;
+            border: solid #e92c64;
+            border-width: 0 5.5px 5.5px 0;
+            transform: rotate(42deg) translate(-2px, -3px);
+        }
+
+        /* 3D Magnifying Glass Handle Stick */
+        .lens-handle-stick-3d {
+            position: absolute;
+            top: 70px;
+            left: 68px;
+            width: 18px;
+            height: 48px;
+            background: linear-gradient(to right, #ff758f 0%, #ffccd5 30%, #e92c64 70%, #a0103a 100%);
+            border-radius: 9px;
+            transform: rotate(-45deg);
+            transform-origin: top left;
+            box-shadow: 
+                8px 12px 18px rgba(0,0,0,0.2), 
+                inset 0 2px 4px rgba(255,255,255,0.3);
+        }
+
+        .lens-handle-stick-3d::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 18px;
+            height: 5px;
+            background: #80082a;
+            border-radius: 0 0 9px 9px;
+        }
+
+        /* 3D Hover Animations */
+        .scene-wrapper:hover .document-note-3d {
+            transform: translate(-50%, -53%) rotateX(11deg) rotateY(-6deg) rotateZ(1deg);
+            box-shadow: 
+                -18px 28px 40px rgba(138, 12, 48, 0.35),
+                -30px 55px 75px rgba(138, 12, 48, 0.25);
+        }
+        
+        .scene-wrapper:hover .lens-graphics-container {
+            transform: translateZ(65px) scale(1.05) rotateX(11deg) rotateY(-6deg) rotateZ(1deg) translateY(-4px);
+        }
+
+        .scene-wrapper:hover .small-box-two-persons {
+            transform: rotateX(5deg) rotateY(-2deg) translateZ(45px) translateY(2px);
+        }
+
+        .scene-wrapper:hover .upper-right-widget {
+            transform: rotate(12deg) scale(1.03);
+        }
+
+        /* Footer Controls Area Wrapper Layout */
+        .footer-action-layer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            width: 100%;
+            margin-bottom: 6px;
+        }
+
+        /* Solid Crisp Dynamic Push Button */
+        .action-button-3d-link {
+            position: relative;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            width: 100%;
+            height: 64px;
+        }
+
+        .btn-extrusion-shadow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            transform: translateY(5px);
+            transition: transform 0.3s ease;
+        }
+
+        .btn-bevel-backplane {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            border-radius: 30px;
+            background: linear-gradient(to left, #ffffff, #ffcbd5, #ffffff);
+            box-shadow: 0 0 0 2px #ffffff;
+        }
+
+        .btn-interactive-surface {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            position: relative;
+            width: 100%;
+            height: 60px;
+            border-radius: 30px;
+            background: #ffffff;
+            color: #e92c64;
+            font-size: 20px;
+            font-weight: 700;
+            transform: translateY(-5px);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s cubic-bezier(0.3, 0.7, 0.4, 1);
+        }
+
+        .btn-interactive-surface .arrow-glyph {
+            font-size: 22px;
+            transition: transform 0.2s ease;
+        }
+
+        .action-button-3d-link:hover .btn-interactive-surface { transform: translateY(-7px); }
+        .action-button-3d-link:hover .btn-extrusion-shadow { transform: translateY(7px); }
+        .action-button-3d-link:hover .arrow-glyph { transform: translateX(5px); }
+        .action-button-3d-link:active .btn-interactive-surface { transform: translateY(-1px); }
+        .action-button-3d-link:active .btn-extrusion-shadow { transform: translateY(2px); }
+
+        /* Progress Dots Framework Navigation Indicator */
+        .carousel-indicator-set {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .dot-node {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.4);
+            transition: all 0.25s ease;
+        }
+
+        .dot-node.active-state {
+            background-color: #ffffff;
+            transform: scale(1.15);
+        }
+
+        .dot-node.hollow-state {
+            background-color: transparent;
+            border: 1.5px solid #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Smartphone UI frame wrapper with deep pink styling -->
+    <div class="phone-frame">
+        
+        <!-- Native Top Status System Bar -->
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="status-icons">
+                <div class="icon-signal"></div>
+                <div class="icon-wifi">🛜</div>
+                <div class="icon-battery"></div>
+            </div>
+        </div>
+
+        <!-- Typography Headline Text Layout -->
+        <div class="heading-section">
+            <p class="welcome-label">Welcome to</p>
+            <h1 class="main-title">Resume<br>Screening<br>System</h1>
+            <p class="subtitle">Smart screening.<br>Better hiring.</p>
+        </div>
+
+        <!-- Graphic Vector 3D Scene Space viewport -->
+        <div class="scene-wrapper">
+            
+            <!-- 3D Added File Box Container Layout with Populated Long Files -->
+            <div class="added-file-box-3d">
+                <div class="files-nest">
+                    <div class="perfect-long-file">
+                        <div class="file-mini-avatar"></div>
+                        <div class="file-stripe"></div>
+                        <div class="file-stripe short"></div>
+                    </div>
+                    <div class="perfect-long-file tall">
+                        <div class="file-stripe"></div>
+                        <div class="file-stripe"></div>
+                        <div class="file-stripe short"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Small Box design showing two people inside -->
+            <div class="small-box-two-persons">
+                <div class="two-persons-graphics">
+                    <div class="avatar-node lead"></div>
+                    <div class="avatar-node follow"></div>
+                </div>
+            </div>
+
+            <!-- Central 3D Note Document Image Box -->
+            <div class="document-note-3d">
+                <div class="note-top-surface">
+                    <div class="note-profile-section">
+                        <div class="inner-circle-avatar"></div>
+                        <div class="skeleton-header-lines">
+                            <div class="sk-line w1"></div>
+                            <div class="sk-line w2"></div>
+                            <div class="sk-line w3"></div>
+                        </div>
+                    </div>
+                    <div class="note-body-skeleton">
+                        <div class="sk-row"><div class="sk-dot"></div><div class="sk-body-bar"></div></div>
+                        <div class="sk-row"><div class="sk-dot"></div><div class="sk-body-bar"></div></div>
+                        <div class="sk-row"><div class="sk-dot"></div><div class="sk-body-bar"></div></div>
+                        <div class="sk-row"><div class="sk-dot"></div><div class="sk-body-bar"></div></div>
+                        <div class="sk-row"><div class="sk-dot"></div><div class="sk-body-bar"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upper Right Floating Small Box Data Widget -->
+            <div class="upper-right-widget">
+                <div class="mini-chart-graphics">
+                    <div class="chart-bar c1"></div>
+                    <div class="chart-bar c2"></div>
+                    <div class="chart-bar c3"></div>
+                </div>
+            </div>
+
+            <!-- Magnifying Glass Lens Graphic Layer -->
+            <div class="lens-graphics-container">
+                <div class="magnifying-lens-rim">
+                    <div class="lens-inner-checkmark"></div>
+                </div>
+                <div class="lens-handle-stick-3d"></div>
+            </div>
+
+        </div>
+
+        <!-- Interactive Core Footer Control Block -->
+        <div class="footer-action-layer">
+            <!-- Dynamic routing configuration using Flask expressions -->
+            <button class="action-button-3d-link" onclick="window.location.href='{{ url_for('second_page') }}'">
+                <div class="btn-extrusion-shadow"></div>
+                <div class="btn-bevel-backplane"></div>
+                <div class="btn-interactive-surface">
+                    Get Started <span class="arrow-glyph">&rarr;</span>
+                </div>
+            </button>
+
+            <!-- Carousel UI state dots -->
+            <div class="carousel-indicator-set">
+                <div class="dot-node active-state"></div>
+                <div class="dot-node hollow-state"></div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
