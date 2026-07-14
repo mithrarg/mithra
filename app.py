@@ -91,8 +91,36 @@ def evaluate_candidate(raw_text, profile, ats_report):
     status = "SELECTED" if overall >= 85 else ("SHORTLISTED" if overall >= 70 else ("MAYBE" if overall >= 55 else "REJECTED"))
     return {"Resume Score": r_score, "ATS Score": ats_report["ATS Score"], "Overall Score": overall, "Decision": status, "Education": edu, "Projects": proj}
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+# ==================== PAGE ROUTING SYSTEM ====================
+
+# 1st Page (Home / Welcome Landing Page)
+@app.route('/')
+def first_page():
+    return render_template('index_2.html')
+
+# 2nd Page
+@app.route('/second')
+def second_page():
+    return render_template('second_page.html')
+
+# 3rd Page
+@app.route('/third')
+def third_page():
+    return render_template('third_page.html')
+
+# 4th Page
+@app.route('/fourth')
+def fourth_page():
+    return render_template('fourth_page.html')
+
+# 5th Page
+@app.route('/fifth')
+def fifth_page():
+    return render_template('fifth_page.html')
+
+# 6th Page (Typically the main processing hub where files are uploaded)
+@app.route('/sixth', methods=['GET', 'POST'])
+def sixth_page():
     if request.method == 'POST':
         if 'resume' not in request.files or request.files['resume'].filename == '':
             flash('Processing Failure: No valid resume file selected.')
@@ -121,14 +149,14 @@ def index():
             fig.savefig(buf, format='png', bbox_inches='tight')
             plot_url = base64.b64encode(buf.getvalue()).decode('utf-8')
             
+            # 7th Page (Renders the calculated visual results)
             return render_template('results.html', details=profile, evaluation=eval_res, plot_url=plot_url, execution_time=duration)
         except Exception as e:
             logging.error(f"Pipeline Fault: {str(e)}")
             flash(f"System error: {str(e)}")
             return redirect(request.url)
             
-    # FIXED: Indented properly to execute inside index() during GET requests
-    return render_template('index.html')
+    return render_template('sixth_page.html')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
