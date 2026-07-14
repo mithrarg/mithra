@@ -506,10 +506,12 @@
 
         <!-- Footer Control Buttons Area -->
         <div class="footer-controls">
-            <button class="btn-primary-pink">
-                Let's Begin
-                <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </button>
+            <a href="{{ url_for('third_page') }}" style="text-decoration: none; width: 100%;">
+                <button class="btn-primary-pink">
+                    Let's Begin
+                    <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </a>
             <div class="carousel-dots">
                 <span class="dot-indicator active"></span>
                 <span class="dot-indicator"></span>
