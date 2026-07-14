@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Screening System Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #FFF2F4 0%, #FFE5E9 100%);
+            --primary-pink: #E91E63;
+            --header-pink: #FF4081;
+            --soft-pink-bg: #FFF5F6;
+            --dark-pink-lens: #E91E63;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --card-shadow: 0 15px 30px rgba(233, 30, 99, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-main);
+        }
+
+        .app-window {
+            width: 100%;
+            max-width: 480px;
+            background: #FFFFFF;
+            border-radius: 40px;
+            box-shadow: 0 30px 70px rgba(233, 30, 99, 0.12);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            border: 4px solid #FFFFFF;
+        }
+
+        /* --- HEADER --- */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo-box {
+            width: 52px;
+            height: 52px;
+            background: #FFFFFF;
+            border: 2.5px solid var(--primary-pink);
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(233, 30, 99, 0.1);
+        }
+
+        .brand-logo-box i {
+            color: var(--primary-pink);
+            font-size: 24px;
+        }
+
+        .brand-logo-box .mini-ai-tag {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: var(--primary-pink);
+            color: white;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 1px 3px;
+            border-radius: 4px;
+        }
+
+        .brand-text h1 {
+            font-size: 1.35rem;
+            color: #0F172A;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .brand-text p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .bell-btn {
+            position: relative;
+            font-size: 22px;
+            color: #1E293B;
+            cursor: pointer;
+        }
+
+        .bell-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--primary-pink);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #FFF;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #FFF5F6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #FFF;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- RECTANGULAR BOX STRUCTURE --- */
+        .welcome-rectangle-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 140px;
+            border: 1px solid #FFE4E8;
+            box-shadow: var(--card-shadow);
+        }
+
+        .welcome-title-area h2 {
+            color: var(--primary-pink);
+            font-size: 1.65rem;
+            font-weight: 700;
+        }
+
+        /* 3D File Box / Graphics Presentation */
+        .file-box-wrapper {
+            position: relative;
+            width: 140px;
+            height: 110px;
+        }
+
+        .outer-file-box {
+            position: absolute;
+            bottom: 0;
+            right: 10px;
+            width: 110px;
+            height: 80px;
+            background: linear-gradient(135deg, #FF527B 0%, #E91E63 100%);
+            border-radius: 16px;
+            box-shadow: 0 12px 24px rgba(233, 30, 99, 0.25), inset 0 2px 4px rgba(255,255,255,0.3);
+            z-index: 2;
+        }
+
+        .inner-file-document {
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            width: 85px;
+            height: 95px;
+            background: #FFFFFF;
+            border-radius: 10px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+            z-index: 1;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border: 1px solid #FFE4E8;
+        }
+
+        .doc-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .doc-pic {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3B82F6;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 9px;
+        }
+
+        .doc-top-lines {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .doc-top-lines span {
+            display: block;
+            height: 3px;
+            background: #CBD5E1;
+            border-radius: 2px;
+            width: 100%;
+        }
+
+        .doc-body-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 2px;
+            color: #334155;
+            font-weight: 500;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #FFF0F2;
+            font-size: 0.88rem;
+        }
+
+        .doc-line {
+            height: 4px;
+            background: #F1F5F9;
+            border-radius: 2px;
+            width: 100%;
+        }
+        .doc-line:nth-child(2) { width: 85%; }
+        .doc-line:nth-child(3) { width: 70%; }
+
+        .doc-stars {
+            display: flex;
+            gap: 2px;
+            color: #FFB020;
+            font-size: 7px;
+            margin-top: auto;
+        }
+
+        /* 3D Magnifying Glass styled with theme colors */
+        .theme-lens-overlay {
+            position: absolute;
+            right: 0;
+            bottom: -8px;
+            width: 44px;
+            height: 44px;
+            border: 5px solid var(--dark-pink-lens);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(2px);
+            z-index: 3;
+            box-shadow: 4px 6px 12px rgba(0,0,0,0.15), inset 2px 2px 4px rgba(255,255,255,0.4);
+        }
+
+        .theme-lens-overlay::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            right: -5px;
+            width: 6px;
+            height: 16px;
+            background: var(--dark-pink-lens);
+            border-radius: 3px;
+            transform: rotate(-45deg);
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* --- SPLIT LAYOUT PANELS --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .grid-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid #FFE4E8;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* 3D Depth Card Animations on Hover */
+        .grid-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 22px 40px rgba(233, 30, 99, 0.14);
+        }
+
+        .card-banner {
+            background: var(--header-pink);
+            color: white;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 16px 14px;
+        }
+
+        /* Expanded 10 Programming Languages List Layout */
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .list-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #334155;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #FFF0F2;
+        }
+
+        .list-row::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            background: var(--primary-pink);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Skills Statistics Configuration */
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .donut-graphic {
+            width: 90px;
+            height: 90px;
+            transform: rotate(-90deg);
+        }
+
+        .chart-legend {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .legend-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .legend-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .percentage-label {
+            font-weight: 600;
+            color: #0F172A;
+        }
+
+        /* --- 3D INTERACTIVE BOTTOM NAVIGATION BAR --- */
+        .dock-navigation {
+            background: var(--soft-pink-bg);
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 6px;
+            border: 1px solid rgba(233, 30, 99, 0.05);
+            margin-top: auto;
+        }
+
+        .dock-navigation a {
+            outline: none;
+        }
+
+        .dock-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: #64748B;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .dock-link i {
+            font-size: 1.25rem;
+        }
+
+        .dock-link.active {
+            color: var(--primary-pink);
+            background: #FFFFFF;
+            box-shadow: 0 4px 8px rgba(233, 30, 99, 0.08), 0 2px 0 var(--primary-pink);
+            transform: translateY(-2px);
+        }
+
+        .dock-link:not(.active):hover {
+            color: #1E293B;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-window">
+        
+        <header class="app-header">
+            <div class="brand-container">
+                <div class="brand-logo-box">
+                    <i class="fa-regular fa-id-card"></i>
+                    <div class="mini-ai-tag">AI</div>
+                </div>
+                <div class="brand-text">
+                    <h1>AI Resume</h1>
+                    <p>Screening System</p>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="bell-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="bell-badge">3</span>
+                </div>
+                <div class="user-avatar">
+                    <!-- Configured image assets explicitly via Flask internal static blueprints -->
+                    <img src="{{ url_for('static', filename='Screenshot 2026-07-07 091010.png') }}" alt="User Avatar">
+                </div>
+            </div>
+        </header>
+
+        <div class="welcome-rectangle-card">
+            <div class="welcome-title-area">
+                <h2>Welcome back!</h2>
+            </div>
+            
+            <div class="file-box-wrapper">
+                <div class="inner-file-document">
+                    <div class="doc-header">
+                        <div class="doc-pic"><i class="fa-solid fa-user"></i></div>
+                        <div class="doc-top-lines">
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <div class="doc-body-lines">
+                        <div class="doc-line">Python</div>
+                        <div class="doc-line">Java</div>
+                        <div class="doc-line">SQL</div>
+                    </div>
+                    <div class="doc-stars">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                </div>
+                <div class="outer-file-box"></div>
+                <div class="theme-lens-overlay"></div>
+            </div>
+        </div>
+
+        <main class="content-grid">
+            
+            <div class="grid-card">
+                <div class="card-banner">
+                    <i class="fa-solid fa-code"></i> Programming Languages
+                </div>
+                <div class="card-body">
+                    <div class="items-list">
+                        <div class="list-row">Python</div>
+                        <div class="list-row">Java</div>
+                        <div class="list-row">C</div>
+                        <div class="list-row">C++</div>
+                        <div class="list-row">JavaScript</div>
+                        <div class="list-row">TypeScript</div>
+                        <div class="list-row">Go</div>
+                        <div class="list-row">SQL</div>
+                        <div class="list-row">Kotlin</div>
+                        <div class="list-row">HTML & CSS</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-card">
+                <div class="card-banner">
+                    <i class="fa-solid fa-star"></i> Top Skills
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <svg class="donut-graphic" viewBox="0 0 42 42">
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#F1F5F9" stroke-width="6"></circle>
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#E91E63" stroke-width="6" stroke-dasharray="35 65" stroke-dashoffset="0"></circle>
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#FF9800" stroke-width="6" stroke-dasharray="25 75" stroke-dashoffset="-35"></circle>
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#10B981" stroke-width="6" stroke-dasharray="20 80" stroke-dashoffset="-60"></circle>
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#3B82F6" stroke-width="6" stroke-dasharray="10 90" stroke-dashoffset="-80"></circle>
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#8B5CF6" stroke-width="6" stroke-dasharray="10 90" stroke-dashoffset="-90"></circle>
+                            <circle cx="21" cy="21" r="10" fill="#FFFFFF"></circle>
+                        </svg>
+
+                        <div class="chart-legend">
+                            <div class="legend-row">
+                                <div class="legend-tag"><span class="indicator-dot" style="background:#E91E63;"></span>Python</div>
+                                <span class="percentage-label">35%</span>
+                            </div>
+                            <div class="legend-row">
+                                <div class="legend-tag"><span class="indicator-dot" style="background:#FF9800;"></span>JavaScript</div>
+                                <span class="percentage-label">25%</span>
+                            </div>
+                            <div class="legend-row">
+                                <div class="legend-tag"><span class="indicator-dot" style="background:#10B981;"></span>SQL</div>
+                                <span class="percentage-label">20%</span>
+                            </div>
+                            <div class="legend-row">
+                                <div class="legend-tag"><span class="indicator-dot" style="background:#3B82F6;"></span>AWS</div>
+                                <span class="percentage-label">10%</span>
+                            </div>
+                            <div class="legend-row">
+                                <div class="legend-tag"><span class="indicator-dot" style="background:#8B5CF6;"></span>Machine Learning</div>
+                                <span class="percentage-label">10%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <nav class="dock-navigation">
+            <a href="#" class="dock-link active">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+            <!-- Dynamic routing configuration mapping cleanly to the fourth-page python view handler -->
+            <a href="{{ url_for('fourtth_page') }}" class="dock-link">
+                <i class="fa-regular fa-file-lines"></i>
+                Resume
+            </a>
+            <a href="#" class="dock-link">
+                <i class="fa-regular fa-circle-check"></i>
+                Verification
+            </a>
+            <a href="#" class="dock-link">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+        </nav>
+
+    </div>
+
+</body>
+</html>
