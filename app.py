@@ -1,9 +1,21 @@
-import os, re, io, base64, logging, spacy, pdfplumber, docx
-from datetime import datetime
-from flask import Flask, render_template, request, redirect, flash
-from matplotlib.figure import Figure
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+import os
+import re 
+import io
+import base64
+import logging 
+import spacy 
+import pdfplumber 
+import docx
+from datetime
+import datetime
+import Flask
+render_template, request, redirect, flash
+import matplotlib.
+import Figure
+from sklearn.feature_extraction.text 
+import CountVectorizer
+from sklearn.metrics.pairwise 
+import cosine_similarity
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "prod-screening-system-token-9988")
