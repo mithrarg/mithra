@@ -1,21 +1,9 @@
-import os
-import re 
-import io
-import base64
-import logging 
-import spacy 
-import pdfplumber 
-import docx
-from datetime
-import datetime
-import Flask
-render_template, request, redirect, flash
-import matplotlib.
-import Figure
-from sklearn.feature_extraction.text 
-import CountVectorizer
-from sklearn.metrics.pairwise 
-import cosine_similarity
+import os, re, io, base64, logging, spacy, pdfplumber, docx
+from datetime import datetime
+from flask import Flask, render_template, request, redirect, flash, url_for
+from matplotlib.figure import Figure
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "prod-screening-system-token-9988")
@@ -102,21 +90,23 @@ def evaluate_candidate(raw_text, profile, ats_report):
 def index():
     if request.method == 'POST':
         if 'resume' not in request.files or request.files['resume'].filename == '':
-            flash('Processing Failure: Invalid upload boundary file.')
+            flash('Processing Failure: No valid resume file selected.')
             return redirect(request.url)
         try:
             start = datetime.now()
             file = request.files['resume']
+            jd_text = request.form.get('job_description', '')
             
             engine = ResumeParserEngine()
             raw_text = engine.extract_text(file)
             profile = engine.parse_profile(raw_text)
             
-            ats_report = ATSEngine(raw_text, request.form.get('job_description', '')).analyze()
+            ats_report = ATSEngine(raw_text, jd_text).analyze()
             eval_res = evaluate_candidate(raw_text, profile, ats_report)
             duration = f"{(datetime.now() - start).total_seconds():.3f}s"
             
-            fig = Figure(figsize=(5, 3.5))
+            # --- Thread-Safe Chart Generation ---
+            fig = Figure(figsize=(6, 4))
             ax = fig.subplots()
             ax.bar(["Resume", "ATS", "Overall"], [eval_res["Resume Score"], eval_res["ATS Score"], eval_res["Overall Score"]], color=['#6366F1', '#10B981', '#F59E0B'])
             ax.set_ylim(0, 100)
@@ -134,4 +124,4 @@ def index():
     return render_template('index.html')
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
