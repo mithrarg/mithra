@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Screening Dashboard</title>
+    <!-- Tailwind CSS for modern layout and styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* 3D Neumorphic / Glassmorphic card styling */
+        .phone-container {
+            width: 412px;
+            height: 800px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #FFF5F7 100%);
+            box-shadow: 0px 25px 50px -12px rgba(255, 75, 120, 0.15), 
+                        0px 0px 40px rgba(0, 0, 0, 0.05);
+            border-radius: 48px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-card {
+            background: #FFFFFF;
+            box-shadow: inset 0px 2px 4px rgba(255, 255, 255, 0.8),
+                        0px 12px 32px rgba(255, 114, 151, 0.08),
+                        0px 2px 8px rgba(0, 0, 0, 0.02);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        /* Review Status Badge Color Palette Dynamic Adjusters */
+        .badge-good { background-color: #E6F4EA; color: #137333; }
+        .badge-average { background-color: #FEF7E0; color: #B06000; }
+        .badge-bad { background-color: #FCE8E6; color: #C5221F; }
+
+        /* Info Card Depth Styling */
+        .info-card {
+            background: linear-gradient(135deg, #FFF6F8 0%, #FFFFFF 100%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.02);
+        }
+
+        /* Smooth Interactive Tabs transition */
+        .nav-tab {
+            transition: color 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+        }
+        .nav-tab:active {
+            transform: scale(0.9);
+        }
+
+        /* Decorative Floating Sparkles */
+        .sparkle-1 { top: 20%; left: 8%; animation: float 4s ease-in-out infinite; }
+        .sparkle-2 { top: 15%; right: 8%; animation: float 4.5s ease-in-out infinite reverse; }
+        .sparkle-3 { bottom: 20%; left: 8%; animation: float 3.8s ease-in-out infinite 0.5s; }
+        .sparkle-4 { bottom: 25%; right: 8%; animation: float 5s ease-in-out infinite 1s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-6px) rotate(10deg) scale(1.03); }
+        }
+
+        /* Custom minimal styling for embedded simulator selectors */
+        .sim-select {
+            background-color: #FFF0F3;
+            border: 1px solid rgba(255, 46, 114, 0.15);
+            color: #FF2E72;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 4px 8px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sim-select:hover {
+            background-color: #FFE5EC;
+        }
+
+        /* Footer Container */
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 8px 8px;
+            border-top: 1px solid #f1f5f9;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.01);
+            border-radius: 1rem;
+            width: 100%;
+        }
+
+        /* Base Navigation Item */
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            gap: 4px;
+            transition: color 0.2s ease;
+            text-decoration: none;
+        }
+
+        /* Default Non-Triggered State */
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            color: #64748b; /* Muted slate gray for inactive items */
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .nav-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b; /* Muted text alignment */
+            tracking-tight;
+        }
+
+        /* Hover & Active Styles */
+        .nav-item:hover .nav-icon {
+            transform: translateY(-2px);
+            color: #FF2E72;
+        }
+        
+        .nav-tab.active-tab {
+            color: #FF2E72 !important;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen p-4">
+
+    <!-- Smartphone Container Viewport Base Frame -->
+    <div class="phone-container flex flex-col justify-between pt-10 pb-4 px-6 select-none">
+        
+        <!-- TOP APP BAR -->
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF2E72] to-[#FF6B9B] p-[2px] shadow-[0_8px_16px_rgba(255,46,114,0.25)] flex items-center justify-center">
+                    <div class="w-full h-full bg-[#FFF0F3] rounded-[14px] flex items-center justify-center">
+                        <svg class="w-6 h-6 text-[#FF2E72]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-[#111827] leading-tight">AI Resume</h1>
+                    <p class="text-xs font-semibold text-[#FF2E72]">Screening System</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="relative cursor-pointer transition-transform active:scale-90">
+                    <svg class="w-7 h-7 text-[#111827]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="absolute -top-1 -right-1 bg-[#FF2E72] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white shadow-sm">3</span>
+                </div>
+                <div class="w-10 h-10 rounded-full border-2 border-white bg-gradient-to-b from-pink-200 to-pink-400 overflow-hidden shadow-md">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" class="w-full h-full object-cover" />
+                </div>
+            </div>
+        </div>
+
+        <!-- DYNAMIC ANALYSIS INPUT FILTER CONTROLS -->
+        <div class="bg-white border border-pink-100 rounded-2xl p-3 mb-3 shadow-[0_4px_12px_rgba(255,46,114,0.04)]">
+            <p class="text-[10px] font-bold text-[#FF2E72] uppercase tracking-wider mb-2">Resume Context Matrices</p>
+            <div class="grid grid-cols-2 gap-2">
+                <div class="flex flex-col gap-0.5">
+                    <label class="text-[9px] font-bold text-gray-500">Target Role</label>
+                    <select id="roleInput" class="sim-select" onchange="runResumeAnalysis()">
+                        <option value="tech">Software Engineer</option>
+                        <option value="creative">UI/UX Designer</option>
+                        <option value="executive">Corporate Director</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <label class="text-[9px] font-bold text-gray-500">Candidate Level</label>
+                    <select id="contextInput" class="sim-select" onchange="runResumeAnalysis()">
+                        <option value="senior">Senior Executive</option>
+                        <option value="junior">Entry-Level / Grad</option>
+                        <option value="changer">Career Transition</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <label class="text-[9px] font-bold text-gray-500">Vibe / Tone Match</label>
+                    <select id="toneInput" class="sim-select" onchange="runResumeAnalysis()">
+                        <option value="confident">Action-Oriented</option>
+                        <option value="balanced">Balanced Professional</option>
+                        <option value="passive">Passive / Vague</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <label class="text-[9px] font-bold text-gray-500">Layout Format</label>
+                    <select id="formatInput" class="sim-select" onchange="runResumeAnalysis()">
+                        <option value="clean">ATS-Parsed Clean</option>
+                        <option value="creative">Modern Multi-column</option>
+                        <option value="poor">Unstructured Text</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN PROGRESS GRAPH CONTAINER CARD -->
+        <div class="main-card flex-1 p-5 flex flex-col justify-start items-stretch relative mb-4 overflow-hidden">
+            
+            <!-- Floating Decorative Shapes -->
+            <div class="absolute sparkle-1 text-[#FF7297] opacity-40"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+            <div class="absolute sparkle-2 text-[#FF2E72] opacity-40"><svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/></svg></div>
+            <div class="absolute sparkle-3 text-[#FF2E72] opacity-40"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/></svg></div>
+            <div class="absolute sparkle-4 text-[#FF7297] opacity-40"><svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+
+            <!-- Vertical Metric Breakdown Grid Stack -->
+            <div class="w-full flex flex-col gap-4 mt-2 z-10">
+                
+                <!-- Category 1: Formatting -->
+                <div class="flex flex-col w-full">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-sm font-bold text-[#0F172A]">Formatting & Layout</span>
+                        <span id="formatBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full transition-all duration-300">Calculating</span>
+                    </div>
+                    <div class="w-full bg-[#FFE5EC] h-2.5 rounded-full overflow-hidden">
+                        <div id="formatBar" class="bg-[#FF2E72] h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                    </div>
+                    <span id="formatLabel" class="text-[11px] font-semibold text-[#64748B] mt-1">0% Match Rating</span>
+                </div>
+
+                <!-- Category 2: Keyword Optimization -->
+                <div class="flex flex-col w-full">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-sm font-bold text-[#0F172A]">Keyword Optimization</span>
+                        <span id="keywordBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full transition-all duration-300">Calculating</span>
+                    </div>
+                    <div class="w-full bg-[#FFE5EC] h-2.5 rounded-full overflow-hidden">
+                        <div id="keywordBar" class="bg-gradient-to-r from-[#FF7297] to-[#FF2E72] h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                    </div>
+                    <span id="keywordLabel" class="text-[11px] font-semibold text-[#64748B] mt-1">0% Match Rating</span>
+                </div>
+
+                <!-- Category 3: Experience Impact -->
+                <div class="flex flex-col w-full">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-sm font-bold text-[#0F172A]">Experience Impact</span>
+                        <span id="impactBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full transition-all duration-300">Calculating</span>
+                    </div>
+                    <div class="w-full bg-[#FFE5EC] h-2.5 rounded-full overflow-hidden">
+                        <div id="impactBar" class="bg-[#FF9800] h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                    </div>
+                    <span id="impactLabel" class="text-[11px] font-semibold text-[#64748B] mt-1">0% Match Rating</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- LOWER EXPLANATION COMPONENT CARD -->
+        <div class="info-card p-4 rounded-3xl flex items-start gap-3 mb-4 relative">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#FF5E8E] to-[#FF2E72] flex items-center justify-center flex-shrink-0 shadow-[0_6px_14px_rgba(255,46,114,0.25)] text-white font-bold text-lg">
+                i
+            </div>
+            <div class="flex-1">
+                <h3 class="text-sm font-bold text-[#0F172A] mb-0.5">Dynamic Engine Diagnostics</h3>
+                <p id="dynamicExplanation" class="text-[11px] text-[#64748B] leading-relaxed font-medium transition-all duration-300">
+                    Awaiting metrics profile...
+                </p>
+            </div>
+        </div>
+
+        <!-- PERSISTENT BOTTOM NAVIGATION BAR -->
+        <div class="footer-nav">
+            <a href="{{ url_for('third_page') }}" class="nav-tab flex-1 flex flex-col items-center gap-1 text-gray-400 py-1">
+                <svg class="w-5 h-5 nav-icon" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                <span class="nav-label">Dashboard</span>
+            </a>
+        
+            <a href="{{ url_for('fourtth_page') }}" class="nav-tab flex-1 flex flex-col items-center gap-1 text-gray-400 py-1">
+                <svg class="w-5 h-5 nav-icon" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+                <span class="nav-label">Resume</span>
+            </a>
+            
+            <a href="{{ url_for('fifth_page') }}" class="nav-tab flex-1 flex flex-col items-center gap-1 active-tab py-1 relative">
+                <svg class="w-5 h-5" fill="none" stroke="#FF2E72" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 0121 12z" />
+                </svg>
+                <span class="text-[9px] font-bold tracking-tight text-[#FF2E72]">Verification</span>
+                <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-[#FF2E72] rounded-full"></span>
+            </a>
+
+            <a href="{{ url_for('seventh page') }}" class="nav-item">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <span class="nav-label">Settings</span>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- RESUME SCREENING ANALYZER CONTROLLER ENGINE -->
+    <script>
+        function runResumeAnalysis() {
+            // Retrieve dynamic parameter matrices from user inputs
+            const role = document.getElementById('roleInput').value;
+            const context = document.getElementById('contextInput').value;
+            const tone = document.getElementById('toneInput').value;
+            const format = document.getElementById('formatInput').value;
+
+            // 1. DYNAMIC CALCULATION: FORMATTING & LAYOUT
+            let formatScore = 75; 
+            if (format === 'clean') formatScore = 96;
+            if (format === 'creative') formatScore = (role === 'creative') ? 92 : 68;
+            if (format === 'poor') formatScore = 32;
+
+            // 2. DYNAMIC CALCULATION: KEYWORD OPTIMIZATION
+            let keywordScore = 70;
+            if (role === 'tech') keywordScore = 91;
+            if (role === 'creative') keywordScore = 84;
+            if (role === 'executive') keywordScore = 78;
+            
+            // Adjust keywords based on candidate context
+            if (context === 'changer') keywordScore -= 22;
+            if (context === 'senior') keywordScore += 8;
+            keywordScore = Math.max(15, Math.min(100, keywordScore));
+
+            // 3. DYNAMIC CALCULATION: EXPERIENCE IMPACT
+            let impactScore = 75;
+            if (tone === 'confident') impactScore = 94;
+            if (tone === 'passive') impactScore = 41;
+            
+            // Interaction adjustment
+            if (context === 'junior' && tone === 'confident') impactScore = 82; 
+            if (context === 'senior' && tone === 'passive') impactScore = 35;
+            impactScore = Math.max(10, Math.min(100, impactScore));
+
+            // UPDATE UI ELEMENTS
+            updateMetricRow('format', formatScore);
+            updateMetricRow('keyword', keywordScore);
+            updateMetricRow('impact', impactScore);
+
+            // GENERATE TEXTUAL CONTEXT EXPLANATIONS DYNAMICALLY
+            generateExplanationText(role, context, tone, format);
+        }
+
+        function updateMetricRow(idPrefix, score) {
+            const progressBar = document.getElementById(`${idPrefix}Bar`);
+            const label = document.getElementById(`${idPrefix}Label`);
+            const badge = document.getElementById(`${idPrefix}Badge`);
+
+            // Apply smooth dynamic progress widths
+            progressBar.style.width = `${score}%`;
+            label.innerText = `${score}% Match Rating`;
+
+            // Reset badge styles dynamically
+            badge.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full transition-all duration-300 ";
+            if (score >= 85) {
+                badge.innerText = "Excellent";
+                badge.classList.add("badge-good");
+            } else if (score >= 60) {
+                badge.innerText = "Acceptable";
+                badge.classList.add("badge-average");
+            } else {
+                badge.innerText = "Critical Help";
+                badge.classList.add("badge-bad");
+            }
+        }
+
+        function generateExplanationText(role, context, tone, format) {
+            const summaryBox = document.getElementById('dynamicExplanation');
+            let explanation = "";
+
+            if (format === 'poor') {
+                explanation += "The unstructured syntax architecture breaks standard parsers. ";
+            } else if (format === 'creative' && role !== 'creative') {
+                explanation += "Multi-column design variants introduce performance friction flags for non-creative parsing loops. ";
+            } else {
+                explanation += "Layout structure scoring models show clear, optimal reading order maps. ";
+            }
+
+            if (context === 'changer') {
+                explanation += "Keyword patterns indicate structural misalignment with typical domain benchmarks. ";
+            } else {
+                explanation += "Vocabulary choices successfully match targeted internal verification templates. ";
+            }
+
+            if (tone === 'passive') {
+                explanation += "Impact values lack quantifiable dynamic verbs needed to push past validation thresholds.";
+            } else {
+                explanation += "Performance achievements show a reliable conversion signal strategy.";
+            }
+
+            summaryBox.innerText = explanation;
+        }
+
+        // Run baseline matrix values on initial DOM boot
+        window.onload = runResumeAnalysis;
+    </script>
+</body>
+</html>
