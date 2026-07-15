@@ -6,240 +6,321 @@
     <title>Screening Results - {{ details['Name'] }}</title>
     <style>
         :root {
-            --bg-main: #f8fafc;
-            --card-bg: #ffffff;
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
+            --bg-main: #0b0f19;
+            --card-bg: rgba(23, 32, 53, 0.65);
+            --card-border: rgba(56, 189, 248, 0.15);
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #38bdf8;
             
-            /* Decision Badges */
+            /* Decision Badges with Modern Neon Glow glow */
             --color-selected: #10b981;
             --color-shortlisted: #3b82f6;
             --color-maybe: #f59e0b;
             --color-rejected: #ef4444;
+            
+            --glow-selected: rgba(16, 185, 129, 0.25);
+            --glow-shortlisted: rgba(59, 130, 246, 0.25);
+            --glow-maybe: rgba(245, 158, 11, 0.25);
+            --glow-rejected: rgba(239, 68, 68, 0.25);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-main);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%);
             color: var(--text-dark);
             line-height: 1.6;
             margin: 0;
-            padding: 40px 20px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
+        /* 3D Device Viewport Frame Container */
+        .phone-wrapper {
+            background: #020617;
+            width: 100%;
+            max-width: 420px;
+            height: 880px;
+            margin: 20px auto;
+            border: 12px solid #1e293b;
+            border-radius: 48px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                0 0 0 4px rgba(56, 189, 248, 0.1),
+                inset 0 4px 12px rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            perspective: 1200px;
+        }
+
+        /* Dynamic Island / Hardware Notch */
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 28px;
+            background: #1e293b;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+            z-index: 100;
+        }
+
+        /* Scrollable Screen Body */
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 20px 30px 20px;
+            scrollbar-width: none; /* Hide standard scrollbar */
+        }
+        .container::-webkit-scrollbar {
+            display: none;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            margin-top: 10px;
         }
 
-        h1, h2, h3 {
-            margin-top: 0;
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
         }
 
         .meta-time {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
+            margin-top: 4px;
         }
 
         .grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        @media (min-width: 768px) {
-            .grid {
-                grid-template-columns: 2fr 1fr;
-            }
-        }
-
+        /* Isometric 3D Layered Cards */
         .card {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        /* Decision Status Badges */
-        .badge {
-            display: inline-block;
-            padding: 6px 16px;
-            font-weight: bold;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
             border-radius: 20px;
-            color: #fff;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
+            padding: 20px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: translateZ(0) scale(1);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                        border-color 0.4s ease, 
+                        box-shadow 0.4s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-        .badge-selected { background-color: var(--color-selected); }
-        .badge-shortlisted { background-color: var(--color-shortlisted); }
-        .badge-maybe { background-color: var(--color-maybe); }
-        .badge-rejected { background-color: var(--color-rejected); }
 
-        /* Profile details list */
-        .profile-info p {
-            margin: 10px 0;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 8px;
+        .card:hover {
+            transform: translateZ(20px) scale(1.02) rotateX(4deg) rotateY(-2deg);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 
+                -10px 15px 30px rgba(0, 0, 0, 0.5),
+                0 0 15px rgba(56, 189, 248, 0.1);
         }
+
+        .card h2 {
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Simulated 3D Icon Tokens via CSS */
+        .card h2::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        /* Profile interactive data elements */
+        .profile-info p {
+            margin: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
         .profile-info strong {
             color: var(--text-muted);
-            display: inline-block;
-            width: 120px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .profile-info a {
+            color: var(--primary);
+            text-decoration: none;
+            word-break: break-all;
+            transition: color 0.2s;
+        }
+        .profile-info a:hover {
+            color: #60a5fa;
+            text-decoration: underline;
         }
 
         .skills-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 6px;
+            margin-top: 12px;
         }
 
         .skill-tag {
-            background-color: #e2e8f0;
-            color: #334155;
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            color: #e0f2fe;
             padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.85rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
             font-weight: 500;
+            transition: all 0.2s;
+        }
+        .skill-tag:hover {
+            background: rgba(56, 189, 248, 0.2);
+            transform: translateY(-2px);
         }
 
-        .chart-box {
+        /* 3D Glass Morphism System Decision Display */
+        .decision-panel {
             text-align: center;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 20px;
+            font-weight: 700;
+            border-radius: 30px;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            transform: translateZ(10px);
+        }
+        .badge-selected { background-color: var(--color-selected); box-shadow: 0 0 20px var(--glow-selected); }
+        .badge-shortlisted { background-color: var(--color-shortlisted); box-shadow: 0 0 20px var(--glow-shortlisted); }
+        .badge-maybe { background-color: var(--color-maybe); box-shadow: 0 0 20px var(--glow-maybe); }
+        .badge-rejected { background-color: var(--color-rejected); box-shadow: 0 0 20px var(--glow-rejected); }
+
+        .score-large {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin: 12px 0 4px 0;
+            background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: translateZ(15px);
+            letter-spacing: -1px;
         }
 
         .chart-box img {
             max-width: 100%;
             height: auto;
-            border-radius: 4px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 10px;
         }
 
-        .score-large {
-            font-size: 3rem;
-            font-weight: 800;
-            margin: 10px 0;
-            color: #1e293b;
+        .list-section h3 {
+            font-size: 0.95rem;
+            margin: 20px 0 10px 0;
+            color: #cbd5e1;
         }
 
         .list-section ul {
-            padding-left: 20px;
+            padding-left: 18px;
             margin: 0;
         }
 
         .list-section li {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         .btn-back {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #0f172a;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff;
             text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background-color 0.2s;
+            border-radius: 50%;
+            font-weight: bold;
+            transition: all 0.2s;
         }
 
         .btn-back:hover {
-            background-color: #1e293b;
+            background: #ffffff;
+            color: #000000;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div>
-            <h1>Screening Report</h1>
-            <div class="meta-time">Processed in {{ execution_time }}</div>
-        </div>
-        <div>
-            <a href="{{ url_for('index') }}" class="btn-back">← New Scan</a>
-        </div>
-    </div>
-
-    <div class="grid">
-        <!-- LEFT COLUMN: Main Candidate Details -->
-        <div class="grid-main" style="display: flex; flex-direction: column; gap: 25px;">
-            
-            <!-- Contact Profile Profile Card -->
-            <div class="card profile-info">
-                <h2>Candidate Profile</h2>
-                <p><strong>Full Name:</strong> {{ details['Name'] }}</p>
-                <p><strong>Email:</strong> {{ details['Email'] }}</p>
-                <p><strong>Phone:</strong> {{ details['Phone'] }}</p>
-                <p><strong>LinkedIn:</strong> 
-                    {% if details['LinkedIn'] != 'Not Found' %}
-                        <a href="{{ details['LinkedIn'] }}" target="_blank">{{ details['LinkedIn'] }}</a>
-                    {% else %}
-                        Not Found
-                    {% endif %}
-                </p>
-                <p><strong>GitHub:</strong> 
-                    {% if details['GitHub'] != 'Not Found' %}
-                        <a href="{{ details['GitHub'] }}" target="_blank">{{ details['GitHub'] }}</a>
-                    {% else %}
-                        Not Found
-                    {% endif %}
-                </p>
-                
-                <h3 style="margin-top: 20px; margin-bottom: 5px;">Detected Core Skills</h3>
-                <div class="skills-container">
-                    {% for skill in details['Skills'] %}
-                        <span class="skill-tag">{{ skill }}</span>
-                    {% endfor %}
-                </div>
+<!-- Device Context Wrapper Frame -->
+<div class="phone-wrapper">
+    <div class="phone-notch"></div>
+    
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="header">
+            <div>
+                <h1>Screening Report</h1>
+                <div class="meta-time">Processed in {{ execution_time }}</div>
             </div>
-
-            <!-- Parsed History Details (Education & Projects) -->
-            <div class="card list-section">
-                <h2>Extracted Background Segments</h2>
-                
-                <h3 style="color: #475569;">Education Indicators</h3>
-                {% if evaluation['Education'] %}
-                    <ul>
-                        {% for edu in evaluation['Education'] %}
-                            <li>{{ edu }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p style="color: var(--text-muted); font-style: italic;">No specific degree/university matching keywords isolated.</p>
-                {% endif %}
-
-                <h3 style="color: #475569; margin-top: 24px;">Project Reference Keywords</h3>
-                {% if evaluation['Projects'] %}
-                    <ul>
-                        {% for proj in evaluation['Projects'] %}
-                            <li>{{ proj }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p style="color: var(--text-muted); font-style: italic;">No specific project milestones isolated.</p>
-                {% endif %}
+            <div>
+                <a href="{{ url_for('index') }}" class="btn-back" title="New Scan">←</a>
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Metrics and Graphs -->
-        <div class="grid-sidebar" style="display: flex; flex-direction: column; gap: 25px;">
+        <!-- Single Flex Matrix Optimized for Mobile Viewports -->
+        <div class="grid">
             
-            <!-- Overall Evaluation Panel -->
-            <div class="card" style="text-align: center;">
+            <!-- SYSTEM DECISION CARD -->
+            <div class="card decision-panel">
                 <h2>System Decision</h2>
-                <div style="margin: 15px 0;">
-                    <!-- Evaluates candidate string status to switch structural styling color variables -->
+                <div style="margin: 20px 0 10px 0;">
                     <span class="badge 
                         {% if evaluation['Decision'] == 'SELECTED' %}badge-selected
                         {% elif evaluation['Decision'] == 'SHORTLISTED' %}badge-shortlisted
@@ -249,18 +330,75 @@
                     </span>
                 </div>
                 <div class="score-large">{{ evaluation['Overall Score'] }}%</div>
-                <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">Composite Matching Matrix Score</p>
+                <p style="color: var(--text-muted); margin: 0; font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">Composite Score</p>
             </div>
 
-            <!-- Matplotlib Chart Panel -->
+            <!-- CANDIDATE METRICS PROFILE CHART -->
             <div class="card chart-box">
                 <h2>Metrics Profile</h2>
                 {% if plot_url %}
                     <img src="data:image/png;base64,{{ plot_url }}" alt="Metrics Breakdown Chart">
                 {% else %}
-                    <p style="color: var(--text-muted); font-style: italic;">Performance matrix graph could not load.</p>
+                    <p style="color: var(--text-muted); font-style: italic; font-size: 0.85rem;">Performance matrix graph could not load.</p>
                 {% endif %}
             </div>
+            
+            <!-- CANDIDATE PROFILE CARD -->
+            <div class="card profile-info">
+                <h2>Candidate Profile</h2>
+                <p><strong>Full Name</strong> {{ details['Name'] }}</p>
+                <p><strong>Email</strong> {{ details['Email'] }}</p>
+                <p><strong>Phone</strong> {{ details['Phone'] }}</p>
+                <p><strong>LinkedIn</strong> 
+                    {% if details['LinkedIn'] != 'Not Found' %}
+                        <a href="{{ details['LinkedIn'] }}" target="_blank">View Profile</a>
+                    {% else %}
+                        Not Found
+                    {% endif %}
+                </p>
+                <p><strong>GitHub</strong> 
+                    {% if details['GitHub'] != 'Not Found' %}
+                        <a href="{{ details['GitHub'] }}" target="_blank">View Repositories</a>
+                    {% else %}
+                        Not Found
+                    {% endif %}
+                </p>
+                
+                <h3>Detected Core Skills</h3>
+                <div class="skills-container">
+                    {% for skill in details['Skills'] %}
+                        <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- EXTRACTED BACKGROUND DATA CARD -->
+            <div class="card list-section">
+                <h2>Extracted Background</h2>
+                
+                <h3>Education Indicators</h3>
+                {% if evaluation['Education'] %}
+                    <ul>
+                        {% for edu in evaluation['Education'] %}
+                            <li>{{ edu }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color: var(--text-muted); font-style: italic; font-size: 0.85rem;">No education matching keywords isolated.</p>
+                {% endif %}
+
+                <h3>Project Reference Keywords</h3>
+                {% if evaluation['Projects'] %}
+                    <ul>
+                        {% for proj in evaluation['Projects'] %}
+                            <li>{{ proj }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color: var(--text-muted); font-style: italic; font-size: 0.85rem;">No specific project milestones isolated.</p>
+                {% endif %}
+            </div>
+
         </div>
     </div>
 </div>
