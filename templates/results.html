@@ -13,7 +13,7 @@
             --text-muted: #94a3b8;
             --primary: #38bdf8;
             
-            /* Decision Badges with Modern Neon Glow glow */
+            /* Decision Badges with Modern Neon Glow */
             --color-selected: #10b981;
             --color-shortlisted: #3b82f6;
             --color-maybe: #f59e0b;
@@ -34,56 +34,19 @@
             color: var(--text-dark);
             line-height: 1.6;
             margin: 0;
-            padding: 0;
+            padding: 40px 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
+            perspective: 1200px; /* Allows 3D perspective structural effects across the whole page */
         }
 
-        /* 3D Device Viewport Frame Container */
-        .phone-wrapper {
-            background: #020617;
-            width: 100%;
-            max-width: 420px;
-            height: 880px;
-            margin: 20px auto;
-            border: 12px solid #1e293b;
-            border-radius: 48px;
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.7),
-                0 0 0 4px rgba(56, 189, 248, 0.1),
-                inset 0 4px 12px rgba(255, 255, 255, 0.05);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            perspective: 1200px;
-        }
-
-        /* Dynamic Island / Hardware Notch */
-        .phone-notch {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 28px;
-            background: #1e293b;
-            border-bottom-left-radius: 18px;
-            border-bottom-right-radius: 18px;
-            z-index: 100;
-        }
-
-        /* Scrollable Screen Body */
+        /* Clean fluid container that matches normal application screen rendering */
         .container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 40px 20px 30px 20px;
-            scrollbar-width: none; /* Hide standard scrollbar */
-        }
-        .container::-webkit-scrollbar {
-            display: none;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
         .header {
@@ -91,13 +54,12 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 16px;
-            margin-bottom: 24px;
-            margin-top: 10px;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             letter-spacing: -0.5px;
             background: linear-gradient(to right, #fff, #94a3b8);
@@ -107,15 +69,32 @@
         }
 
         .meta-time {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             margin-top: 4px;
         }
 
+        /* Responsive Adaptive Grid System */
         .grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 2fr 1fr; /* Two columns layout on larger desktops */
+            }
+            .grid-sidebar {
+                display: flex;
+                flex-direction: column;
+                gap: 25px;
+            }
+            .grid-main {
+                display: flex;
+                flex-direction: column;
+                gap: 25px;
+            }
         }
 
         /* Isometric 3D Layered Cards */
@@ -125,7 +104,7 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 20px;
-            padding: 20px;
+            padding: 24px;
             position: relative;
             transform-style: preserve-3d;
             transform: translateZ(0) scale(1);
@@ -144,7 +123,8 @@
         }
 
         .card h2 {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
+            margin-top: 0;
             margin-bottom: 16px;
             color: #ffffff;
             display: flex;
@@ -152,7 +132,7 @@
             gap: 8px;
         }
 
-        /* Simulated 3D Icon Tokens via CSS */
+        /* 3D Visual Dot Element */
         .card h2::before {
             content: '';
             display: inline-block;
@@ -163,29 +143,23 @@
             box-shadow: 0 0 8px var(--primary);
         }
 
-        /* Profile interactive data elements */
         .profile-info p {
             margin: 12px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             padding-bottom: 10px;
-            font-size: 0.9rem;
-            display: flex;
-            flex-direction: column;
+            font-size: 0.95rem;
         }
         
         .profile-info strong {
             color: var(--text-muted);
             font-weight: 500;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            display: inline-block;
+            width: 120px;
         }
 
         .profile-info a {
             color: var(--primary);
             text-decoration: none;
-            word-break: break-all;
             transition: color 0.2s;
         }
         .profile-info a:hover {
@@ -196,7 +170,7 @@
         .skills-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 8px;
             margin-top: 12px;
         }
 
@@ -204,9 +178,9 @@
             background: rgba(56, 189, 248, 0.08);
             border: 1px solid rgba(56, 189, 248, 0.15);
             color: #e0f2fe;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 500;
             transition: all 0.2s;
         }
@@ -215,7 +189,7 @@
             transform: translateY(-2px);
         }
 
-        /* 3D Glass Morphism System Decision Display */
+        /* Decision Panel Graphics */
         .decision-panel {
             text-align: center;
             background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
@@ -228,7 +202,7 @@
             border-radius: 30px;
             color: #fff;
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             letter-spacing: 1px;
             box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
             transform: translateZ(10px);
@@ -241,7 +215,7 @@
         .score-large {
             font-size: 3.5rem;
             font-weight: 900;
-            margin: 12px 0 4px 0;
+            margin: 15px 0 5px 0;
             background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -258,19 +232,19 @@
         }
 
         .list-section h3 {
-            font-size: 0.95rem;
-            margin: 20px 0 10px 0;
+            font-size: 1.05rem;
+            margin: 24px 0 12px 0;
             color: #cbd5e1;
         }
 
         .list-section ul {
-            padding-left: 18px;
+            padding-left: 20px;
             margin: 0;
         }
 
         .list-section li {
             margin-bottom: 10px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
         }
 
@@ -278,87 +252,57 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            padding: 10px 20px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff;
             text-decoration: none;
-            border-radius: 50%;
-            font-weight: bold;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
             transition: all 0.2s;
         }
 
         .btn-back:hover {
             background: #ffffff;
             color: #000000;
-            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
 
-<!-- Device Context Wrapper Frame -->
-<div class="phone-wrapper">
-    <div class="phone-notch"></div>
-    
-    <div class="container">
-        <!-- Dashboard Header -->
-        <div class="header">
-            <div>
-                <h1>Screening Report</h1>
-                <div class="meta-time">Processed in {{ execution_time }}</div>
-            </div>
-            <div>
-                <a href="{{ url_for('index') }}" class="btn-back" title="New Scan">←</a>
-            </div>
+<div class="container">
+    <!-- Dashboard Header -->
+    <div class="header">
+        <div>
+            <h1>Screening Report</h1>
+            <div class="meta-time">Processed in {{ execution_time }}</div>
         </div>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn-back">← New Scan</a>
+        </div>
+    </div>
 
-        <!-- Single Flex Matrix Optimized for Mobile Viewports -->
-        <div class="grid">
+    <div class="grid">
+        <!-- LEFT COLUMN: Main Candidate Details -->
+        <div class="grid-main">
             
-            <!-- SYSTEM DECISION CARD -->
-            <div class="card decision-panel">
-                <h2>System Decision</h2>
-                <div style="margin: 20px 0 10px 0;">
-                    <span class="badge 
-                        {% if evaluation['Decision'] == 'SELECTED' %}badge-selected
-                        {% elif evaluation['Decision'] == 'SHORTLISTED' %}badge-shortlisted
-                        {% elif evaluation['Decision'] == 'MAYBE' %}badge-maybe
-                        {% else %}badge-rejected{% endif %}">
-                        {{ evaluation['Decision'] }}
-                    </span>
-                </div>
-                <div class="score-large">{{ evaluation['Overall Score'] }}%</div>
-                <p style="color: var(--text-muted); margin: 0; font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">Composite Score</p>
-            </div>
-
-            <!-- CANDIDATE METRICS PROFILE CHART -->
-            <div class="card chart-box">
-                <h2>Metrics Profile</h2>
-                {% if plot_url %}
-                    <img src="data:image/png;base64,{{ plot_url }}" alt="Metrics Breakdown Chart">
-                {% else %}
-                    <p style="color: var(--text-muted); font-style: italic; font-size: 0.85rem;">Performance matrix graph could not load.</p>
-                {% endif %}
-            </div>
-            
-            <!-- CANDIDATE PROFILE CARD -->
+            <!-- Candidate Profile Card -->
             <div class="card profile-info">
                 <h2>Candidate Profile</h2>
-                <p><strong>Full Name</strong> {{ details['Name'] }}</p>
-                <p><strong>Email</strong> {{ details['Email'] }}</p>
-                <p><strong>Phone</strong> {{ details['Phone'] }}</p>
-                <p><strong>LinkedIn</strong> 
+                <p><strong>Full Name:</strong> {{ details['Name'] }}</p>
+                <p><strong>Email:</strong> {{ details['Email'] }}</p>
+                <p><strong>Phone:</strong> {{ details['Phone'] }}</p>
+                <p><strong>LinkedIn:</strong> 
                     {% if details['LinkedIn'] != 'Not Found' %}
-                        <a href="{{ details['LinkedIn'] }}" target="_blank">View Profile</a>
+                        <a href="{{ details['LinkedIn'] }}" target="_blank">{{ details['LinkedIn'] }}</a>
                     {% else %}
                         Not Found
                     {% endif %}
                 </p>
-                <p><strong>GitHub</strong> 
+                <p><strong>GitHub:</strong> 
                     {% if details['GitHub'] != 'Not Found' %}
-                        <a href="{{ details['GitHub'] }}" target="_blank">View Repositories</a>
+                        <a href="{{ details['GitHub'] }}" target="_blank">{{ details['GitHub'] }}</a>
                     {% else %}
                         Not Found
                     {% endif %}
@@ -372,9 +316,9 @@
                 </div>
             </div>
 
-            <!-- EXTRACTED BACKGROUND DATA CARD -->
+            <!-- Extracted Background Card -->
             <div class="card list-section">
-                <h2>Extracted Background</h2>
+                <h2>Extracted Background Segments</h2>
                 
                 <h3>Education Indicators</h3>
                 {% if evaluation['Education'] %}
@@ -384,7 +328,7 @@
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p style="color: var(--text-muted); font-style: italic; font-size: 0.85rem;">No education matching keywords isolated.</p>
+                    <p style="color: var(--text-muted); font-style: italic;">No specific degree/university matching keywords isolated.</p>
                 {% endif %}
 
                 <h3>Project Reference Keywords</h3>
@@ -395,10 +339,39 @@
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p style="color: var(--text-muted); font-style: italic; font-size: 0.85rem;">No specific project milestones isolated.</p>
+                    <p style="color: var(--text-muted); font-style: italic;">No specific project milestones isolated.</p>
                 {% endif %}
             </div>
+        </div>
 
+        <!-- RIGHT COLUMN: Metrics and Graphs -->
+        <div class="grid-sidebar">
+            
+            <!-- System Decision Card -->
+            <div class="card decision-panel">
+                <h2>System Decision</h2>
+                <div style="margin: 15px 0;">
+                    <span class="badge 
+                        {% if evaluation['Decision'] == 'SELECTED' %}badge-selected
+                        {% elif evaluation['Decision'] == 'SHORTLISTED' %}badge-shortlisted
+                        {% elif evaluation['Decision'] == 'MAYBE' %}badge-maybe
+                        {% else %}badge-rejected{% endif %}">
+                        {{ evaluation['Decision'] }}
+                    </span>
+                </div>
+                <div class="score-large">{{ evaluation['Overall Score'] }}%</div>
+                <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">Composite Matching Matrix Score</p>
+            </div>
+
+            <!-- Metrics Chart Panel -->
+            <div class="card chart-box">
+                <h2>Metrics Profile</h2>
+                {% if plot_url %}
+                    <img src="data:image/png;base64,{{ plot_url }}" alt="Metrics Breakdown Chart">
+                {% else %}
+                    <p style="color: var(--text-muted); font-style: italic;">Performance matrix graph could not load.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
