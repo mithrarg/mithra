@@ -28,8 +28,8 @@
           {% endif %}
         {% endwith %}
 
-        <!-- Main Submission Form -->
-        <form action="/" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <!-- Main Submission Form pointing to /sixth processing route -->
+        <form action="/sixth" method="POST" enctype="multipart/form-data" class="space-y-6">
             
             <!-- Job Description Field Section -->
             <div>
@@ -40,7 +40,7 @@
                     rows="6" 
                     placeholder="Paste the target job requirements, roles, or expected keywords here..."
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition resize-y"
-                ></textarea>
+                >{% if request.form.get('job_description') %}{{ request.form.get('job_description') }}{% endif %}</textarea>
             </div>
 
             <!-- Custom File Upload Component Zone -->
