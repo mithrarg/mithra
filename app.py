@@ -34,8 +34,6 @@ class ResumeParserEngine:
         clean = re.sub(r'\s+', ' ', text).strip()
         email = re.findall(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}', clean)
         phone = re.findall(r'(\+?\d[\d\s\-]{8,15}\d)', clean)
-        lnk = re.findall(r'https?://(?:www\.)?linkedin\.com/[^\s"\'\>]+', clean)
-        git = re.findall(r'https?://(?:www\.)?github\.com/[^\s"\'\>]+', clean)
         
         name = "Not Found"
         if nlp and nlp.has_pipe("ner"):
@@ -47,8 +45,13 @@ class ResumeParserEngine:
 
         skills = ["PYTHON", "JAVA", "C++", "JAVASCRIPT", "SQL", "GIT", "DOCKER", "AWS", "FLASK", "REACT", "LINUX"]
         found_skills = [s for s in skills if re.search(rf'\b{s}\b', clean.upper())]
-        return {"Name": name, "Email": email[0] if email else "Not Found", "Phone": phone[0] if phone else "Not Found",
-                "LinkedIn": lnk[0] if lnk else "Not Found", "GitHub": git[0] if git else "Not Found", "Skills": found_skills or ["PYTHON", "SQL"]}
+        
+        return {
+            "Name": name, 
+            "Email": email[0] if email else "Not Found", 
+            "Phone": phone[0] if phone else "Not Found",
+            "Skills": found_skills or ["PYTHON", "SQL"]
+        }
 
 class ATSEngine:
     def __init__(self, resume, jd):
