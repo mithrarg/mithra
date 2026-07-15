@@ -91,44 +91,50 @@ def evaluate_candidate(raw_text, profile, ats_report):
     status = "SELECTED" if overall >= 85 else ("SHORTLISTED" if overall >= 70 else ("MAYBE" if overall >= 55 else "REJECTED"))
     return {"Resume Score": r_score, "ATS Score": ats_report["ATS Score"], "Overall Score": overall, "Decision": status, "Education": edu, "Projects": proj}
 
-@app.route('/', methods=['GET', 'POST'])
+# --- Core Routing Setup ---
+
+@app.route('/', methods=['GET'])
 def index():
-    if request.method == 'POST':
-        if 'resume' not in request.files or request.files['resume'].filename == '':
-            flash('Processing Failure: No valid resume file selected.')
-            return redirect(request.url)
-        try:
-            start = datetime.now()
-            file = request.files['resume']
-            jd_text = request.form.get('job_description', '')
-            
-            engine = ResumeParserEngine()
-            raw_text = engine.extract_text(file)
-            profile = engine.parse_profile(raw_text)
-            
-            ats_report = ATSEngine(raw_text, jd_text).analyze()
-            eval_res = evaluate_candidate(raw_text, profile, ats_report)
-            duration = f"{(datetime.now() - start).total_seconds():.3f}s"
-            
-            # --- Thread-Safe Headless Chart Generation ---
-            fig = Figure(figsize=(6, 4))
-            ax = fig.subplots()
-            ax.bar(["Resume", "ATS", "Overall"], [eval_res["Resume Score"], eval_res["ATS Score"], eval_res["Overall Score"]], color=['#6366F1', '#10B981', '#F59E0B'])
-            ax.set_ylim(0, 100)
-            ax.set_title("Metrics Profile Breakdown")
-            
-            buf = io.BytesIO()
-            fig.savefig(buf, format='png', bbox_inches='tight')
-            plot_url = base64.b64encode(buf.getvalue()).decode('utf-8')
-            
-            return render_template('results.html', details=profile, evaluation=eval_res, plot_url=plot_url, execution_time=duration)
-        except Exception as e:
-            logging.error(f"Pipeline Fault: {str(e)}")
-            flash(f"System error: {str(e)}")
-            return redirect(request.url)
-            
-    # FIXED: Indented properly to execute inside index() during GET requests
+    """Renders the main upload interface."""
     return render_template('index.html')
+
+@app.route('/results', methods=['POST'])
+def results():
+    """Handles parsing pipelines and views metrics output."""
+    if 'resume' not in request.files or request.files['resume'].filename == '':
+        flash('Processing Failure: No valid resume file selected.')
+        return redirect(url_for('index'))
+        
+    try:
+        start = datetime.now()
+        file = request.files['resume']
+        jd_text = request.form.get('job_description', '')
+        
+        engine = ResumeParserEngine()
+        raw_text = engine.extract_text(file)
+        profile = engine.parse_profile(raw_text)
+        
+        ats_report = ATSEngine(raw_text, jd_text).analyze()
+        eval_res = evaluate_candidate(raw_text, profile, ats_report)
+        duration = f"{(datetime.now() - start).total_seconds():.3f}s"
+        
+        # --- Thread-Safe Headless Chart Generation ---
+        fig = Figure(figsize=(6, 4))
+        ax = fig.subplots()
+        ax.bar(["Resume", "ATS", "Overall"], [eval_res["Resume Score"], eval_res["ATS Score"], eval_res["Overall Score"]], color=['#6366F1', '#10B981', '#F59E0B'])
+        ax.set_ylim(0, 100)
+        ax.set_title("Metrics Profile Breakdown")
+        
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png', bbox_inches='tight')
+        plot_url = base64.b64encode(buf.getvalue()).decode('utf-8')
+        
+        return render_template('results.html', details=profile, evaluation=eval_res, plot_url=plot_url, execution_time=duration)
+        
+    except Exception as e:
+        logging.error(f"Pipeline Fault: {str(e)}")
+        flash(f"System error: {str(e)}")
+        return redirect(url_for('index'))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
