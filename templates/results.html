@@ -35,20 +35,68 @@
             color: var(--text-dark);
             line-height: 1.6;
             margin: 0;
-            padding: 16px 12px;
+            padding: 0;
             display: flex;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
         }
 
-        /* Responsive Mobile Container Frame */
+        /* Desktop Smartphone Shell Wrapper */
+        @media (min-width: 480px) {
+            body {
+                padding: 20px;
+                background-attachment: fixed;
+            }
+            .mobile-device-frame {
+                width: 412px;
+                height: 840px;
+                border: 12px solid #1e293b;
+                border-radius: 40px;
+                background-color: var(--bg-main);
+                box-shadow: 
+                    0 25px 50px -12px rgba(0, 0, 0, 0.8), 
+                    0 0 40px rgba(56, 189, 248, 0.1);
+                overflow-y: auto;
+                position: relative;
+                /* Custom subtle scrollbar */
+                scrollbar-width: none; /* Firefox */
+            }
+            .mobile-device-frame::-webkit-scrollbar {
+                display: none; /* Safari and Chrome */
+            }
+            /* Subtle camera notch graphic for device realism */
+            .mobile-device-frame::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 110px;
+                height: 18px;
+                background: #1e293b;
+                border-bottom-left-radius: 12px;
+                border-bottom-right-radius: 12px;
+                z-index: 100;
+            }
+        }
+
+        /* Screen Content Container */
         .container {
             width: 100%;
-            max-width: 1000px;
-            margin: 0 auto;
+            padding: 24px 20px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Spacing adjustment for top notch on desktop device mode */
+        @media (min-width: 480px) {
+            .container {
+                padding-top: 32px;
+            }
         }
 
         /* Header Styles */
@@ -58,13 +106,13 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 20px;
-            margin-bottom: 25px;
+            padding-bottom: 16px;
+            margin-bottom: 8px;
             gap: 15px;
         }
 
         h1 {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
             letter-spacing: -0.5px;
             background: linear-gradient(to right, #fff, #94a3b8);
@@ -74,16 +122,17 @@
         }
 
         .meta-time {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
-        /* Adaptive Mobile-First Grid System */
+        /* Enforce single vertical column for true Mobile Layout */
         .grid {
             display: flex;
             flex-direction: column;
             gap: 20px;
+            width: 100%;
         }
 
         .grid-main, .grid-sidebar {
@@ -91,21 +140,6 @@
             flex-direction: column;
             gap: 20px;
             width: 100%;
-        }
-
-        /* Desktop Layout Override */
-        @media (min-width: 768px) {
-            body {
-                padding: 40px 20px;
-            }
-            h1 {
-                font-size: 1.8rem;
-            }
-            .grid {
-                display: grid;
-                grid-template-columns: 1.6fr 1fr;
-                align-items: start;
-            }
         }
 
         /* Dynamic 3D Isometric Cards */
@@ -120,13 +154,14 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 20px;
-            padding: 24px;
+            padding: 20px;
             position: relative;
             transform-style: preserve-3d;
             transform: rotateX(0deg) rotateY(0deg) translateZ(0px);
             transition: transform 0.15s ease-out, border-color 0.4s ease, box-shadow 0.4s ease;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             will-change: transform;
+            box-sizing: border-box;
         }
 
         /* Touch devices dynamic state */
@@ -140,13 +175,13 @@
         }
 
         .card h2 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             transform: translateZ(30px);
         }
 
@@ -228,10 +263,10 @@
 
         /* Card Elements Inner Parallax depth */
         .profile-info p {
-            margin: 14px 0;
+            margin: 12px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            padding-bottom: 12px;
-            font-size: 0.95rem;
+            padding-bottom: 10px;
+            font-size: 0.9rem;
             transform: translateZ(15px);
             display: flex;
             flex-direction: column;
@@ -240,23 +275,13 @@
         .profile-info strong {
             color: var(--text-muted);
             font-weight: 500;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            font-size: 0.8rem;
         }
 
         .profile-info span.val {
             color: var(--text-dark);
             word-break: break-all;
-        }
-
-        @media(min-width: 480px) {
-            .profile-info p {
-                flex-direction: row;
-            }
-            .profile-info strong {
-                width: 130px;
-                margin-bottom: 0;
-                flex-shrink: 0;
-            }
         }
 
         .profile-info a {
@@ -272,8 +297,8 @@
         .skills-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 6px;
+            margin-top: 10px;
             transform: translateZ(20px);
         }
 
@@ -281,16 +306,16 @@
             background: rgba(56, 189, 248, 0.08);
             border: 1px solid rgba(56, 189, 248, 0.15);
             color: #e0f2fe;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
             font-weight: 500;
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
         .skill-tag:hover {
             background: rgba(56, 189, 248, 0.25);
-            transform: translateZ(10px) translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            transform: translateZ(10px) translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
         /* Decision Panel Graphics */
@@ -301,12 +326,12 @@
 
         .badge {
             display: inline-block;
-            padding: 8px 20px;
+            padding: 6px 16px;
             font-weight: 700;
             border-radius: 30px;
             color: #fff;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             letter-spacing: 1px;
             box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
             transform: translateZ(25px);
@@ -319,9 +344,9 @@
         .badge-rejected { background-color: var(--color-rejected); box-shadow: 0 0 20px var(--glow-rejected); }
 
         .score-large {
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 900;
-            margin: 15px 0 5px 0;
+            margin: 12px 0 2px 0;
             background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -334,7 +359,7 @@
             transform: translateZ(20px);
             color: var(--text-muted); 
             margin: 0; 
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
         .chart-box img {
@@ -348,21 +373,21 @@
         }
 
         .list-section h3 {
-            font-size: 1.05rem;
-            margin: 24px 0 12px 0;
+            font-size: 0.95rem;
+            margin: 18px 0 8px 0;
             color: #cbd5e1;
             transform: translateZ(15px);
         }
 
         .list-section ul {
-            padding-left: 20px;
+            padding-left: 18px;
             margin: 0;
             transform: translateZ(15px);
         }
 
         .list-section li {
-            margin-bottom: 10px;
-            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
             color: var(--text-muted);
         }
 
@@ -370,14 +395,14 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 16px;
+            padding: 8px 12px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 500;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             transition: all 0.2s;
             white-space: nowrap;
         }
@@ -390,23 +415,46 @@
 </head>
 <body>
 
-<div class="container">
-    <!-- Dashboard Header -->
-    <div class="header">
-        <div>
-            <h1>Screening Report</h1>
-            <div class="meta-time">Processed in {{ execution_time }}</div>
+<!-- High-Tech Mobile device mock wrapper active on desktops -->
+<div class="mobile-device-frame">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="header">
+            <div>
+                <h1>Screening Report</h1>
+                <div class="meta-time">Processed in {{ execution_time }}</div>
+            </div>
+            <div>
+                <a href="{{ url_for('index') }}" class="btn-back">← New Scan</a>
+            </div>
         </div>
-        <div>
-            <a href="{{ url_for('index') }}" class="btn-back">← New Scan</a>
-        </div>
-    </div>
 
-    <div class="grid">
-        <!-- LEFT COLUMN: Main Candidate Details -->
-        <div class="grid-main">
+        <div class="grid">
             
-            <!-- Candidate Profile Card -->
+            <!-- 1. System Decision Card (Moved up for prominent mobile-first positioning) -->
+            <div class="card-perspective">
+                <div class="card decision-panel">
+                    <h2>
+                        <div class="icon-container-3d">
+                            <div class="icon-decision"></div>
+                        </div>
+                        System Decision
+                    </h2>
+                    <div style="margin: 10px 0; transform: translateZ(20px);">
+                        <span class="badge 
+                            {% if evaluation['Decision'] == 'SELECTED' %}badge-selected
+                            {% elif evaluation['Decision'] == 'SHORTLISTED' %}badge-shortlisted
+                            {% elif evaluation['Decision'] == 'MAYBE' %}badge-maybe
+                            {% else %}badge-rejected{% endif %}">
+                            {{ evaluation['Decision'] }}
+                        </span>
+                    </div>
+                    <div class="score-large">{{ evaluation['Overall Score'] }}%</div>
+                    <p class="sub-txt">Composite Matching Matrix Score</p>
+                </div>
+            </div>
+
+            <!-- 2. Candidate Profile Card -->
             <div class="card-perspective">
                 <div class="card profile-info">
                     <h2>
@@ -430,70 +478,7 @@
                 </div>
             </div>
 
-            <!-- Extracted Background Card -->
-            <div class="card-perspective">
-                <div class="card list-section">
-                    <h2>
-                        <div class="icon-container-3d icon-database">
-                            <div class="disk disk-1"></div>
-                            <div class="disk disk-2"></div>
-                            <div class="disk disk-3"></div>
-                        </div>
-                        Extracted Background Segments
-                    </h2>
-                    
-                    <h3>Education Indicators</h3>
-                    {% if evaluation['Education'] %}
-                        <ul>
-                            {% for edu in evaluation['Education'] %}
-                                <li>{{ edu }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">No specific degree/university matching keywords isolated.</p>
-                    {% endif %}
-
-                    <h3>Project Reference Keywords</h3>
-                    {% if evaluation['Projects'] %}
-                        <ul>
-                            {% for proj in evaluation['Projects'] %}
-                                <li>{{ proj }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">No specific project milestones isolated.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- RIGHT COLUMN: Metrics and Graphs -->
-        <div class="grid-sidebar">
-            
-            <!-- System Decision Card -->
-            <div class="card-perspective">
-                <div class="card decision-panel">
-                    <h2>
-                        <div class="icon-container-3d">
-                            <div class="icon-decision"></div>
-                        </div>
-                        System Decision
-                    </h2>
-                    <div style="margin: 15px 0; transform: translateZ(20px);">
-                        <span class="badge 
-                            {% if evaluation['Decision'] == 'SELECTED' %}badge-selected
-                            {% elif evaluation['Decision'] == 'SHORTLISTED' %}badge-shortlisted
-                            {% elif evaluation['Decision'] == 'MAYBE' %}badge-maybe
-                            {% else %}badge-rejected{% endif %}">
-                            {{ evaluation['Decision'] }}
-                        </span>
-                    </div>
-                    <div class="score-large">{{ evaluation['Overall Score'] }}%</div>
-                    <p class="sub-txt">Composite Matching Matrix Score</p>
-                </div>
-            </div>
-
-            <!-- Metrics Chart Panel -->
+            <!-- 3. Metrics Chart Panel -->
             <div class="card-perspective">
                 <div class="card chart-box">
                     <h2>
@@ -507,16 +492,53 @@
                     {% if plot_url %}
                         <img src="data:image/png;base64,{{ plot_url }}" alt="Metrics Breakdown Chart">
                     {% else %}
-                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">Performance matrix graph could not load.</p>
+                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px); font-size: 0.85rem;">Performance matrix graph could not load.</p>
                     {% endif %}
                 </div>
             </div>
+
+            <!-- 4. Extracted Background Card -->
+            <div class="card-perspective">
+                <div class="card list-section">
+                    <h2>
+                        <div class="icon-container-3d icon-database">
+                            <div class="disk disk-1"></div>
+                            <div class="disk disk-2"></div>
+                            <div class="disk disk-3"></div>
+                        </div>
+                        Extracted Background
+                    </h2>
+                    
+                    <h3>Education Indicators</h3>
+                    {% if evaluation['Education'] %}
+                        <ul>
+                            {% for edu in evaluation['Education'] %}
+                                <li>{{ edu }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px); font-size: 0.85rem;">No specific degree/university matching keywords isolated.</p>
+                    {% endif %}
+
+                    <h3>Project Reference Keywords</h3>
+                    {% if evaluation['Projects'] %}
+                        <ul>
+                            {% for proj in evaluation['Projects'] %}
+                                <li>{{ proj }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px); font-size: 0.85rem;">No specific project milestones isolated.</p>
+                    {% endif %}
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
 <script>
-    // Premium Interactive 3D Parallax Tracking Functionality
+    // Premium Interactive 3D Parallax Tracking Functionality (with Touch adaptation)
     document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('mousemove', e => {
             const rect = card.getBoundingClientRect();
@@ -526,7 +548,7 @@
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             
-            // Adjust tilt intensity (divide by larger numbers to make tilt subtler)
+            // Subtle tilt dynamic logic
             const rotateX = ((centerY - y) / centerY) * 10; 
             const rotateY = ((x - centerX) / centerX) * 10;
             
@@ -534,7 +556,7 @@
         });
 
         card.addEventListener('mouseleave', () => {
-            // Smoothly snap card back to center on exit
+            // Smooth snap back to default layout axis
             card.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(0px)';
         });
     });
