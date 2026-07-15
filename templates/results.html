@@ -34,15 +34,14 @@
             color: var(--text-dark);
             line-height: 1.6;
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px 15px;
             display: flex;
             justify-content: center;
             min-height: 100vh;
             box-sizing: border-box;
-            perspective: 1200px; /* Allows 3D perspective structural effects across the whole page */
+            perspective: 1200px;
         }
 
-        /* Clean fluid container that matches normal application screen rendering */
         .container {
             width: 100%;
             max-width: 1000px;
@@ -51,15 +50,17 @@
 
         .header {
             display: flex;
+            flex-direction: row;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             padding-bottom: 20px;
             margin-bottom: 30px;
+            gap: 15px;
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: -0.5px;
             background: linear-gradient(to right, #fff, #94a3b8);
@@ -69,35 +70,40 @@
         }
 
         .meta-time {
-            font-size: 0.85rem;
+            font-size: 0.80rem;
             color: var(--text-muted);
             margin-top: 4px;
         }
 
-        /* Responsive Adaptive Grid System */
+        /* Mobile-First Adaptive Grid System */
         .grid {
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 25px;
         }
 
+        .grid-main, .grid-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: 100%;
+        }
+
+        /* Desktop Layout Override */
         @media (min-width: 768px) {
+            body {
+                padding: 40px 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
             .grid {
-                grid-template-columns: 2fr 1fr; /* Two columns layout on larger desktops */
-            }
-            .grid-sidebar {
-                display: flex;
-                flex-direction: column;
-                gap: 25px;
-            }
-            .grid-main {
-                display: flex;
-                flex-direction: column;
-                gap: 25px;
+                display: grid;
+                grid-template-columns: 2fr 1fr;
             }
         }
 
-        /* Isometric 3D Layered Cards */
+        /* 3D Isometric Layered Cards & Deep Dynamic Hover */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
@@ -107,54 +113,84 @@
             padding: 24px;
             position: relative;
             transform-style: preserve-3d;
-            transform: translateZ(0) scale(1);
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), 
+            transform: rotateX(0deg) rotateY(0deg) translateZ(0px);
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
                         border-color 0.4s ease, 
-                        box-shadow 0.4s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                        box-shadow 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
         .card:hover {
-            transform: translateZ(20px) scale(1.02) rotateX(4deg) rotateY(-2deg);
-            border-color: rgba(56, 189, 248, 0.4);
+            transform: rotateX(6deg) rotateY(-4deg) translateZ(25px);
+            border-color: rgba(56, 189, 248, 0.45);
             box-shadow: 
-                -10px 15px 30px rgba(0, 0, 0, 0.5),
-                0 0 15px rgba(56, 189, 248, 0.1);
+                -15px 20px 35px rgba(0, 0, 0, 0.6),
+                0 0 25px rgba(56, 189, 248, 0.15);
         }
 
+        /* Internal Elements 3D Pop Effect */
         .card h2 {
             font-size: 1.25rem;
             margin-top: 0;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            transform: translateZ(30px);
         }
 
-        /* 3D Visual Dot Element */
-        .card h2::before {
-            content: '';
-            display: inline-block;
-            width: 8px;
-            height: 8px;
+        /* CSS-Based 3D Tactile Icon Architecture */
+        .icon-3d {
+            position: relative;
+            width: 24px;
+            height: 24px;
             background: var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--primary);
+            border-radius: 6px;
+            transform-style: preserve-3d;
+            transform: rotateX(-20deg) rotateY(25deg);
+            box-shadow: -2px 2px 0px #0284c7, -4px 4px 5px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+        .icon-3d::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            transform: translateZ(4px);
         }
 
         .profile-info p {
-            margin: 12px 0;
+            margin: 14px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             font-size: 0.95rem;
+            transform: translateZ(15px);
+            display: flex;
+            flex-direction: column;
         }
-        
+
         .profile-info strong {
             color: var(--text-muted);
             font-weight: 500;
-            display: inline-block;
-            width: 120px;
+            margin-bottom: 4px;
+        }
+
+        .profile-info span.val {
+            color: var(--text-dark);
+            word-break: break-all;
+        }
+
+        @media(min-width: 480px) {
+            .profile-info p {
+                flex-direction: row;
+            }
+            .profile-info strong {
+                width: 130px;
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
         }
 
         .profile-info a {
@@ -172,21 +208,23 @@
             flex-wrap: wrap;
             gap: 8px;
             margin-top: 12px;
+            transform: translateZ(20px);
         }
 
         .skill-tag {
             background: rgba(56, 189, 248, 0.08);
             border: 1px solid rgba(56, 189, 248, 0.15);
             color: #e0f2fe;
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 8px;
             font-size: 0.85rem;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
         .skill-tag:hover {
-            background: rgba(56, 189, 248, 0.2);
-            transform: translateY(-2px);
+            background: rgba(56, 189, 248, 0.25);
+            transform: translateZ(10px) translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
         }
 
         /* Decision Panel Graphics */
@@ -205,7 +243,11 @@
             font-size: 0.85rem;
             letter-spacing: 1px;
             box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
-            transform: translateZ(10px);
+            transform: translateZ(25px);
+            transition: transform 0.3s;
+        }
+        .card:hover .badge {
+            transform: translateZ(40px) scale(1.05);
         }
         .badge-selected { background-color: var(--color-selected); box-shadow: 0 0 20px var(--glow-selected); }
         .badge-shortlisted { background-color: var(--color-shortlisted); box-shadow: 0 0 20px var(--glow-shortlisted); }
@@ -219,8 +261,19 @@
             background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            transform: translateZ(15px);
+            transform: translateZ(35px);
             letter-spacing: -1px;
+            transition: transform 0.3s;
+        }
+        .card:hover .score-large {
+            transform: translateZ(50px);
+        }
+
+        .sub-txt {
+            transform: translateZ(20px);
+            color: var(--text-muted); 
+            margin: 0; 
+            font-size: 0.9rem;
         }
 
         .chart-box img {
@@ -229,17 +282,24 @@
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             margin-top: 10px;
+            transform: translateZ(20px);
+            transition: transform 0.3s;
+        }
+        .card:hover img {
+            transform: translateZ(30px);
         }
 
         .list-section h3 {
             font-size: 1.05rem;
             margin: 24px 0 12px 0;
             color: #cbd5e1;
+            transform: translateZ(15px);
         }
 
         .list-section ul {
             padding-left: 20px;
             margin: 0;
+            transform: translateZ(15px);
         }
 
         .list-section li {
@@ -252,15 +312,16 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 20px;
+            padding: 10px 16px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .btn-back:hover {
@@ -289,10 +350,10 @@
             
             <!-- Candidate Profile Card -->
             <div class="card profile-info">
-                <h2>Candidate Profile</h2>
-                <p><strong>Full Name:</strong> {{ details['Name'] }}</p>
-                <p><strong>Email:</strong> {{ details['Email'] }}</p>
-                <p><strong>Phone:</strong> {{ details['Phone'] }}</p>
+                <h2><div class="icon-3d"></div>Candidate Profile</h2>
+                <p><strong>Full Name:</strong><span class="val">{{ details['Name'] }}</span></p>
+                <p><strong>Email:</strong><span class="val">{{ details['Email'] }}</span></p>
+                <p><strong>Phone:</strong><span class="val">{{ details['Phone'] }}</span></p>
                 
                 <h3>Detected Core Skills</h3>
                 <div class="skills-container">
@@ -304,7 +365,7 @@
 
             <!-- Extracted Background Card -->
             <div class="card list-section">
-                <h2>Extracted Background Segments</h2>
+                <h2><div class="icon-3d"></div>Extracted Background Segments</h2>
                 
                 <h3>Education Indicators</h3>
                 {% if evaluation['Education'] %}
@@ -314,7 +375,7 @@
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p style="color: var(--text-muted); font-style: italic;">No specific degree/university matching keywords isolated.</p>
+                    <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">No specific degree/university matching keywords isolated.</p>
                 {% endif %}
 
                 <h3>Project Reference Keywords</h3>
@@ -325,7 +386,7 @@
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p style="color: var(--text-muted); font-style: italic;">No specific project milestones isolated.</p>
+                    <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">No specific project milestones isolated.</p>
                 {% endif %}
             </div>
         </div>
@@ -335,8 +396,8 @@
             
             <!-- System Decision Card -->
             <div class="card decision-panel">
-                <h2>System Decision</h2>
-                <div style="margin: 15px 0;">
+                <h2><div class="icon-3d"></div>System Decision</h2>
+                <div style="margin: 15px 0; transform: translateZ(20px);">
                     <span class="badge 
                         {% if evaluation['Decision'] == 'SELECTED' %}badge-selected
                         {% elif evaluation['Decision'] == 'SHORTLISTED' %}badge-shortlisted
@@ -346,16 +407,16 @@
                     </span>
                 </div>
                 <div class="score-large">{{ evaluation['Overall Score'] }}%</div>
-                <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">Composite Matching Matrix Score</p>
+                <p class="sub-txt">Composite Matching Matrix Score</p>
             </div>
 
             <!-- Metrics Chart Panel -->
             <div class="card chart-box">
-                <h2>Metrics Profile</h2>
+                <h2><div class="icon-3d"></div>Metrics Profile</h2>
                 {% if plot_url %}
                     <img src="data:image/png;base64,{{ plot_url }}" alt="Metrics Breakdown Chart">
                 {% else %}
-                    <p style="color: var(--text-muted); font-style: italic;">Performance matrix graph could not load.</p>
+                    <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">Performance matrix graph could not load.</p>
                 {% endif %}
             </div>
         </div>
