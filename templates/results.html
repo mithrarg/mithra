@@ -293,20 +293,6 @@
                 <p><strong>Full Name:</strong> {{ details['Name'] }}</p>
                 <p><strong>Email:</strong> {{ details['Email'] }}</p>
                 <p><strong>Phone:</strong> {{ details['Phone'] }}</p>
-                <p><strong>LinkedIn:</strong> 
-                    {% if details['LinkedIn'] != 'Not Found' %}
-                        <a href="{{ details['LinkedIn'] }}" target="_blank">{{ details['LinkedIn'] }}</a>
-                    {% else %}
-                        Not Found
-                    {% endif %}
-                </p>
-                <p><strong>GitHub:</strong> 
-                    {% if details['GitHub'] != 'Not Found' %}
-                        <a href="{{ details['GitHub'] }}" target="_blank">{{ details['GitHub'] }}</a>
-                    {% else %}
-                        Not Found
-                    {% endif %}
-                </p>
                 
                 <h3>Detected Core Skills</h3>
                 <div class="skills-container">
