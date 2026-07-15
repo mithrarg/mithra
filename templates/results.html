@@ -12,6 +12,7 @@
             --text-dark: #f8fafc;
             --text-muted: #94a3b8;
             --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.3);
             
             /* Decision Badges with Modern Neon Glow */
             --color-selected: #10b981;
@@ -19,10 +20,10 @@
             --color-maybe: #f59e0b;
             --color-rejected: #ef4444;
             
-            --glow-selected: rgba(16, 185, 129, 0.25);
-            --glow-shortlisted: rgba(59, 130, 246, 0.25);
-            --glow-maybe: rgba(245, 158, 11, 0.25);
-            --glow-rejected: rgba(239, 68, 68, 0.25);
+            --glow-selected: rgba(16, 185, 129, 0.35);
+            --glow-shortlisted: rgba(59, 130, 246, 0.35);
+            --glow-maybe: rgba(245, 158, 11, 0.35);
+            --glow-rejected: rgba(239, 68, 68, 0.35);
         }
 
         body {
@@ -34,20 +35,23 @@
             color: var(--text-dark);
             line-height: 1.6;
             margin: 0;
-            padding: 20px 15px;
+            padding: 16px 12px;
             display: flex;
             justify-content: center;
             min-height: 100vh;
             box-sizing: border-box;
-            perspective: 1200px;
         }
 
+        /* Responsive Mobile Container Frame */
         .container {
             width: 100%;
             max-width: 1000px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Header Styles */
         .header {
             display: flex;
             flex-direction: row;
@@ -55,12 +59,12 @@
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             padding-bottom: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             gap: 15px;
         }
 
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
             letter-spacing: -0.5px;
             background: linear-gradient(to right, #fff, #94a3b8);
@@ -70,22 +74,22 @@
         }
 
         .meta-time {
-            font-size: 0.80rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             margin-top: 4px;
         }
 
-        /* Mobile-First Adaptive Grid System */
+        /* Adaptive Mobile-First Grid System */
         .grid {
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 20px;
         }
 
         .grid-main, .grid-sidebar {
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 20px;
             width: 100%;
         }
 
@@ -99,11 +103,17 @@
             }
             .grid {
                 display: grid;
-                grid-template-columns: 2fr 1fr;
+                grid-template-columns: 1.6fr 1fr;
+                align-items: start;
             }
         }
 
-        /* 3D Isometric Layered Cards & Deep Dynamic Hover */
+        /* Dynamic 3D Isometric Cards */
+        .card-perspective {
+            perspective: 1000px;
+            width: 100%;
+        }
+
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
@@ -114,53 +124,109 @@
             position: relative;
             transform-style: preserve-3d;
             transform: rotateX(0deg) rotateY(0deg) translateZ(0px);
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
-                        border-color 0.4s ease, 
-                        box-shadow 0.5s ease;
+            transition: transform 0.15s ease-out, border-color 0.4s ease, box-shadow 0.4s ease;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            will-change: transform;
         }
 
-        .card:hover {
-            transform: rotateX(6deg) rotateY(-4deg) translateZ(25px);
-            border-color: rgba(56, 189, 248, 0.45);
-            box-shadow: 
-                -15px 20px 35px rgba(0, 0, 0, 0.6),
-                0 0 25px rgba(56, 189, 248, 0.15);
+        /* Touch devices dynamic state */
+        @media (hover: hover) {
+            .card:hover {
+                border-color: rgba(56, 189, 248, 0.45);
+                box-shadow: 
+                    0 20px 40px rgba(0, 0, 0, 0.6),
+                    0 0 25px rgba(56, 189, 248, 0.15);
+            }
         }
 
-        /* Internal Elements 3D Pop Effect */
         .card h2 {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             margin-top: 0;
             margin-bottom: 20px;
             color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             transform: translateZ(30px);
         }
 
-        /* CSS-Based 3D Tactile Icon Architecture */
-        .icon-3d {
+        /* Individual 3D CSS Tactile Icons */
+        .icon-container-3d {
+            width: 32px;
+            height: 32px;
             position: relative;
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            border-radius: 6px;
             transform-style: preserve-3d;
-            transform: rotateX(-20deg) rotateY(25deg);
-            box-shadow: -2px 2px 0px #0284c7, -4px 4px 5px rgba(0,0,0,0.5);
+            transform: rotateX(-20deg) rotateY(20deg);
             flex-shrink: 0;
         }
-        .icon-3d::before {
-            content: '';
+
+        /* 3D Profile Icon (Layered Cards) */
+        .icon-profile .layer {
             position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            transform: translateZ(4px);
+            width: 20px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: -2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .icon-profile .layer-1 { transform: translateZ(0px); opacity: 0.4; }
+        .icon-profile .layer-2 { transform: translateZ(6px); opacity: 0.7; background: #0284c7; }
+        .icon-profile .layer-3 { 
+            transform: translateZ(12px); 
+            background: linear-gradient(135deg, var(--primary), #0284c7);
         }
 
+        /* 3D Database/List Icon (Stacked Disks) */
+        .icon-database .disk {
+            position: absolute;
+            width: 24px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+        .icon-database .disk-1 { transform: translateY(0px) translateZ(0px); }
+        .icon-database .disk-2 { transform: translateY(6px) translateZ(5px); background: #0284c7; }
+        .icon-database .disk-3 { transform: translateY(12px) translateZ(10px); background: #0369a1; }
+
+        /* 3D System Decision Icon (Glowing Isometric Cube) */
+        .icon-decision {
+            background: var(--primary);
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            transform-style: preserve-3d;
+            transform: translateZ(10px);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+        .icon-decision::before, .icon-decision::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #0284c7;
+        }
+        .icon-decision::before { transform: rotateY(90deg) translateZ(10px); background: #0369a1; }
+        .icon-decision::after { transform: rotateX(90deg) translateZ(10px); background: #38bdf8; }
+
+        /* 3D Charts Icon (Isometric Bar Columns) */
+        .icon-charts .bar {
+            position: absolute;
+            bottom: 4px;
+            width: 6px;
+            background: var(--primary);
+            transform-style: preserve-3d;
+            box-shadow: -1px 1px 3px rgba(0,0,0,0.3);
+        }
+        .icon-charts .bar-1 { height: 12px; left: 2px; transform: translateZ(0px); }
+        .icon-charts .bar-2 { height: 18px; left: 11px; transform: translateZ(6px); background: #0284c7; }
+        .icon-charts .bar-3 { height: 24px; left: 20px; transform: translateZ(12px); background: #0369a1; }
+
+        /* Card Elements Inner Parallax depth */
         .profile-info p {
             margin: 14px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
@@ -244,11 +310,9 @@
             letter-spacing: 1px;
             box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
             transform: translateZ(25px);
-            transition: transform 0.3s;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        .card:hover .badge {
-            transform: translateZ(40px) scale(1.05);
-        }
+        
         .badge-selected { background-color: var(--color-selected); box-shadow: 0 0 20px var(--glow-selected); }
         .badge-shortlisted { background-color: var(--color-shortlisted); box-shadow: 0 0 20px var(--glow-shortlisted); }
         .badge-maybe { background-color: var(--color-maybe); box-shadow: 0 0 20px var(--glow-maybe); }
@@ -263,10 +327,7 @@
             -webkit-text-fill-color: transparent;
             transform: translateZ(35px);
             letter-spacing: -1px;
-            transition: transform 0.3s;
-        }
-        .card:hover .score-large {
-            transform: translateZ(50px);
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .sub-txt {
@@ -283,10 +344,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             margin-top: 10px;
             transform: translateZ(20px);
-            transition: transform 0.3s;
-        }
-        .card:hover img {
-            transform: translateZ(30px);
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .list-section h3 {
@@ -349,45 +407,63 @@
         <div class="grid-main">
             
             <!-- Candidate Profile Card -->
-            <div class="card profile-info">
-                <h2><div class="icon-3d"></div>Candidate Profile</h2>
-                <p><strong>Full Name:</strong><span class="val">{{ details['Name'] }}</span></p>
-                <p><strong>Email:</strong><span class="val">{{ details['Email'] }}</span></p>
-                <p><strong>Phone:</strong><span class="val">{{ details['Phone'] }}</span></p>
-                
-                <h3>Detected Core Skills</h3>
-                <div class="skills-container">
-                    {% for skill in details['Skills'] %}
-                        <span class="skill-tag">{{ skill }}</span>
-                    {% endfor %}
+            <div class="card-perspective">
+                <div class="card profile-info">
+                    <h2>
+                        <div class="icon-container-3d icon-profile">
+                            <div class="layer layer-1"></div>
+                            <div class="layer layer-2"></div>
+                            <div class="layer layer-3"></div>
+                        </div>
+                        Candidate Profile
+                    </h2>
+                    <p><strong>Full Name:</strong><span class="val">{{ details['Name'] }}</span></p>
+                    <p><strong>Email:</strong><span class="val">{{ details['Email'] }}</span></p>
+                    <p><strong>Phone:</strong><span class="val">{{ details['Phone'] }}</span></p>
+                    
+                    <h3>Detected Core Skills</h3>
+                    <div class="skills-container">
+                        {% for skill in details['Skills'] %}
+                            <span class="skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
 
             <!-- Extracted Background Card -->
-            <div class="card list-section">
-                <h2><div class="icon-3d"></div>Extracted Background Segments</h2>
-                
-                <h3>Education Indicators</h3>
-                {% if evaluation['Education'] %}
-                    <ul>
-                        {% for edu in evaluation['Education'] %}
-                            <li>{{ edu }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">No specific degree/university matching keywords isolated.</p>
-                {% endif %}
+            <div class="card-perspective">
+                <div class="card list-section">
+                    <h2>
+                        <div class="icon-container-3d icon-database">
+                            <div class="disk disk-1"></div>
+                            <div class="disk disk-2"></div>
+                            <div class="disk disk-3"></div>
+                        </div>
+                        Extracted Background Segments
+                    </h2>
+                    
+                    <h3>Education Indicators</h3>
+                    {% if evaluation['Education'] %}
+                        <ul>
+                            {% for edu in evaluation['Education'] %}
+                                <li>{{ edu }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">No specific degree/university matching keywords isolated.</p>
+                    {% endif %}
 
-                <h3>Project Reference Keywords</h3>
-                {% if evaluation['Projects'] %}
-                    <ul>
-                        {% for proj in evaluation['Projects'] %}
-                            <li>{{ proj }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">No specific project milestones isolated.</p>
-                {% endif %}
+                    <h3>Project Reference Keywords</h3>
+                    {% if evaluation['Projects'] %}
+                        <ul>
+                            {% for proj in evaluation['Projects'] %}
+                                <li>{{ proj }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">No specific project milestones isolated.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
@@ -395,33 +471,74 @@
         <div class="grid-sidebar">
             
             <!-- System Decision Card -->
-            <div class="card decision-panel">
-                <h2><div class="icon-3d"></div>System Decision</h2>
-                <div style="margin: 15px 0; transform: translateZ(20px);">
-                    <span class="badge 
-                        {% if evaluation['Decision'] == 'SELECTED' %}badge-selected
-                        {% elif evaluation['Decision'] == 'SHORTLISTED' %}badge-shortlisted
-                        {% elif evaluation['Decision'] == 'MAYBE' %}badge-maybe
-                        {% else %}badge-rejected{% endif %}">
-                        {{ evaluation['Decision'] }}
-                    </span>
+            <div class="card-perspective">
+                <div class="card decision-panel">
+                    <h2>
+                        <div class="icon-container-3d">
+                            <div class="icon-decision"></div>
+                        </div>
+                        System Decision
+                    </h2>
+                    <div style="margin: 15px 0; transform: translateZ(20px);">
+                        <span class="badge 
+                            {% if evaluation['Decision'] == 'SELECTED' %}badge-selected
+                            {% elif evaluation['Decision'] == 'SHORTLISTED' %}badge-shortlisted
+                            {% elif evaluation['Decision'] == 'MAYBE' %}badge-maybe
+                            {% else %}badge-rejected{% endif %}">
+                            {{ evaluation['Decision'] }}
+                        </span>
+                    </div>
+                    <div class="score-large">{{ evaluation['Overall Score'] }}%</div>
+                    <p class="sub-txt">Composite Matching Matrix Score</p>
                 </div>
-                <div class="score-large">{{ evaluation['Overall Score'] }}%</div>
-                <p class="sub-txt">Composite Matching Matrix Score</p>
             </div>
 
             <!-- Metrics Chart Panel -->
-            <div class="card chart-box">
-                <h2><div class="icon-3d"></div>Metrics Profile</h2>
-                {% if plot_url %}
-                    <img src="data:image/png;base64,{{ plot_url }}" alt="Metrics Breakdown Chart">
-                {% else %}
-                    <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">Performance matrix graph could not load.</p>
-                {% endif %}
+            <div class="card-perspective">
+                <div class="card chart-box">
+                    <h2>
+                        <div class="icon-container-3d icon-charts">
+                            <div class="bar bar-1"></div>
+                            <div class="bar bar-2"></div>
+                            <div class="bar bar-3"></div>
+                        </div>
+                        Metrics Profile
+                    </h2>
+                    {% if plot_url %}
+                        <img src="data:image/png;base64,{{ plot_url }}" alt="Metrics Breakdown Chart">
+                    {% else %}
+                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px);">Performance matrix graph could not load.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Premium Interactive 3D Parallax Tracking Functionality
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left; // x coordinate inside the element.
+            const y = e.clientY - rect.top;  // y coordinate inside the element.
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            // Adjust tilt intensity (divide by larger numbers to make tilt subtler)
+            const rotateX = ((centerY - y) / centerY) * 10; 
+            const rotateY = ((x - centerX) / centerX) * 10;
+            
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(15px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            // Smoothly snap card back to center on exit
+            card.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(0px)';
+        });
+    });
+</script>
 
 </body>
 </html>
