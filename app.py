@@ -1,4 +1,11 @@
-import os, re, io, base64, logging, spacy, pdfplumber, docx
+import os
+import re
+import io
+import base64
+import logging
+import spacy
+import pdfplumber
+import docx
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, flash, url_for
 
@@ -39,7 +46,8 @@ class ResumeParserEngine:
         if nlp and nlp.has_pipe("ner"):
             for ent in nlp(clean[:1000]).ents:
                 if ent.label_ == "PERSON" and len(ent.text.split()) <= 4:
-                    name = ent.text; break
+                    name = ent.text
+                    break
         if name == "Not Found" and text.splitlines():
             name = text.splitlines()[0].strip()
 
@@ -59,7 +67,8 @@ class ATSEngine:
         self.jd_text = re.sub(r'[^a-z0-9 ]', ' ', (jd or "Software engineer Python developer").lower())
 
     def get_tokens(self, text):
-        if nlp: return list(set([t.lemma_ for t in nlp(text) if not t.is_stop and len(t.text) > 2]))
+        if nlp: 
+            return list(set([t.lemma_ for t in nlp(text) if not t.is_stop and len(t.text) > 2]))
         return list(set([w for w in text.split() if len(w) > 2]))
 
     def analyze(self):
@@ -70,7 +79,8 @@ class ATSEngine:
         try:
             matrix = CountVectorizer().fit_transform([self.r_text, self.jd_text])
             sim_score = cosine_similarity(matrix)[0][1] * 100
-        except: sim_score = 0
+        except: 
+            sim_score = 0
         
         ats = round((match_pct * 0.6) + (sim_score * 0.4), 2)
         return {"ATS Score": ats, "Matched": matched, "Missing": [w for w in jd_tok if w not in r_tok]}
@@ -83,9 +93,15 @@ def evaluate_candidate(raw_text, profile, ats_report):
     s_score = min(30, max(5, len(profile["Skills"]) * 3))
     e_score = 12
     for item in [e.lower() for e in edu]:
-        if "phd" in item: e_score = 20; break
-        elif any(k in item for k in ["master", "m.tech", "m.s"]): e_score = 18; break
-        elif any(k in item for k in ["bachelor", "b.tech", "b.e"]): e_score = 16; break
+        if "phd" in item: 
+            e_score = 20
+            break
+        elif any(k in item for k in ["master", "m.tech", "m.s"]): 
+            e_score = 18
+            break
+        elif any(k in item for k in ["bachelor", "b.tech", "b.e"]): 
+            e_score = 16
+            break
             
     p_score = 15 if len(proj) >= 4 else (12 if len(proj) >= 2 else 10)
     r_score = s_score + e_score + p_score
@@ -97,8 +113,13 @@ def evaluate_candidate(raw_text, profile, ats_report):
 # --- Core Routing Setup ---
 
 @app.route('/', methods=['GET'])
+def welcome():
+    """Renders the initial welcome onboarding interface splash screen."""
+    return render_template('welcome.html')
+
+@app.route('/index', methods=['GET'])
 def index():
-    """Renders the main upload interface."""
+    """Renders the main upload visual device dashboard."""
     return render_template('index.html')
 
 @app.route('/results', methods=['POST'])
