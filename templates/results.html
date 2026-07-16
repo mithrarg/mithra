@@ -4,563 +4,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Screening Results - {{ details['Name'] }}</title>
+    <!-- Tailwind CSS Engine CDN (Matching index.html) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        :root {
-            --bg-main: #0b0f19;
-            --card-bg: rgba(23, 32, 53, 0.65);
-            --card-border: rgba(56, 189, 248, 0.15);
-            --text-dark: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #38bdf8;
-            --primary-glow: rgba(56, 189, 248, 0.3);
-            
-            /* Decision Badges with Modern Neon Glow */
-            --color-selected: #10b981;
-            --color-shortlisted: #3b82f6;
-            --color-maybe: #f59e0b;
-            --color-rejected: #ef4444;
-            
-            --glow-selected: rgba(16, 185, 129, 0.35);
-            --glow-shortlisted: rgba(59, 130, 246, 0.35);
-            --glow-maybe: rgba(245, 158, 11, 0.35);
-            --glow-rejected: rgba(239, 68, 68, 0.35);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-main);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%);
-            color: var(--text-dark);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-
-        /* Desktop Smartphone Shell Wrapper */
-        @media (min-width: 480px) {
-            body {
-                padding: 20px;
-                background-attachment: fixed;
-            }
-            .mobile-device-frame {
-                width: 412px;
-                height: 840px;
-                border: 12px solid #1e293b;
-                border-radius: 40px;
-                background-color: var(--bg-main);
-                box-shadow: 
-                    0 25px 50px -12px rgba(0, 0, 0, 0.8), 
-                    0 0 40px rgba(56, 189, 248, 0.1);
-                overflow-y: auto;
-                position: relative;
-                /* Custom subtle scrollbar */
-                scrollbar-width: none; /* Firefox */
-            }
-            .mobile-device-frame::-webkit-scrollbar {
-                display: none; /* Safari and Chrome */
-            }
-            /* Subtle camera notch graphic for device realism */
-            .mobile-device-frame::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 110px;
-                height: 18px;
-                background: #1e293b;
-                border-bottom-left-radius: 12px;
-                border-bottom-right-radius: 12px;
-                z-index: 100;
-            }
-        }
-
-        /* Screen Content Container */
-        .container {
-            width: 100%;
-            padding: 24px 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Spacing adjustment for top notch on desktop device mode */
-        @media (min-width: 480px) {
-            .container {
-                padding-top: 32px;
-            }
-        }
-
-        /* Header Styles */
-        .header {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 16px;
-            margin-bottom: 8px;
-            gap: 15px;
-        }
-
-        h1 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-        }
-
-        .meta-time {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        /* Enforce single vertical column for true Mobile Layout */
-        .grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-        }
-
-        .grid-main, .grid-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-        }
-
-        /* Dynamic 3D Isometric Cards */
-        .card-perspective {
+        .perspective-container {
             perspective: 1000px;
-            width: 100%;
         }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 20px;
-            position: relative;
+        .3d-card {
             transform-style: preserve-3d;
-            transform: rotateX(0deg) rotateY(0deg) translateZ(0px);
-            transition: transform 0.15s ease-out, border-color 0.4s ease, box-shadow 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            will-change: transform;
-            box-sizing: border-box;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
         }
-
-        /* Touch devices dynamic state */
-        @media (hover: hover) {
-            .card:hover {
-                border-color: rgba(56, 189, 248, 0.45);
-                box-shadow: 
-                    0 20px 40px rgba(0, 0, 0, 0.6),
-                    0 0 25px rgba(56, 189, 248, 0.15);
-            }
+        .mobile-viewport::-webkit-scrollbar {
+            width: 4px;
         }
-
-        .card h2 {
-            font-size: 1.1rem;
-            margin-top: 0;
-            margin-bottom: 16px;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transform: translateZ(30px);
+        .mobile-viewport::-webkit-scrollbar-track {
+            background: transparent;
         }
-
-        /* Individual 3D CSS Tactile Icons */
-        .icon-container-3d {
-            width: 32px;
-            height: 32px;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: rotateX(-20deg) rotateY(20deg);
-            flex-shrink: 0;
-        }
-
-        /* 3D Profile Icon (Layered Cards) */
-        .icon-profile .layer {
-            position: absolute;
-            width: 20px;
-            height: 24px;
-            background: var(--primary);
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: -2px 2px 4px rgba(0,0,0,0.5);
-        }
-        .icon-profile .layer-1 { transform: translateZ(0px); opacity: 0.4; }
-        .icon-profile .layer-2 { transform: translateZ(6px); opacity: 0.7; background: #0284c7; }
-        .icon-profile .layer-3 { 
-            transform: translateZ(12px); 
-            background: linear-gradient(135deg, var(--primary), #0284c7);
-        }
-
-        /* 3D Database/List Icon (Stacked Disks) */
-        .icon-database .disk {
-            position: absolute;
-            width: 24px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-        }
-        .icon-database .disk-1 { transform: translateY(0px) translateZ(0px); }
-        .icon-database .disk-2 { transform: translateY(6px) translateZ(5px); background: #0284c7; }
-        .icon-database .disk-3 { transform: translateY(12px) translateZ(10px); background: #0369a1; }
-
-        /* 3D System Decision Icon (Glowing Isometric Cube) */
-        .icon-decision {
-            background: var(--primary);
-            width: 20px;
-            height: 20px;
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            transform-style: preserve-3d;
-            transform: translateZ(10px);
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
-        .icon-decision::before, .icon-decision::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: #0284c7;
-        }
-        .icon-decision::before { transform: rotateY(90deg) translateZ(10px); background: #0369a1; }
-        .icon-decision::after { transform: rotateX(90deg) translateZ(10px); background: #38bdf8; }
-
-        /* 3D Charts Icon (Isometric Bar Columns) */
-        .icon-charts .bar {
-            position: absolute;
-            bottom: 4px;
-            width: 6px;
-            background: var(--primary);
-            transform-style: preserve-3d;
-            box-shadow: -1px 1px 3px rgba(0,0,0,0.3);
-        }
-        .icon-charts .bar-1 { height: 12px; left: 2px; transform: translateZ(0px); }
-        .icon-charts .bar-2 { height: 18px; left: 11px; transform: translateZ(6px); background: #0284c7; }
-        .icon-charts .bar-3 { height: 24px; left: 20px; transform: translateZ(12px); background: #0369a1; }
-
-        /* Card Elements Inner Parallax depth */
-        .profile-info p {
-            margin: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            padding-bottom: 10px;
-            font-size: 0.9rem;
-            transform: translateZ(15px);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .profile-info strong {
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-bottom: 2px;
-            font-size: 0.8rem;
-        }
-
-        .profile-info span.val {
-            color: var(--text-dark);
-            word-break: break-all;
-        }
-
-        .profile-info a {
-            color: var(--primary);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .profile-info a:hover {
-            color: #60a5fa;
-            text-decoration: underline;
-        }
-
-        .skills-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 10px;
-            transform: translateZ(20px);
-        }
-
-        .skill-tag {
-            background: rgba(56, 189, 248, 0.08);
-            border: 1px solid rgba(56, 189, 248, 0.15);
-            color: #e0f2fe;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .skill-tag:hover {
-            background: rgba(56, 189, 248, 0.25);
-            transform: translateZ(10px) translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        /* Decision Panel Graphics */
-        .decision-panel {
-            text-align: center;
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 6px 16px;
-            font-weight: 700;
-            border-radius: 30px;
-            color: #fff;
-            text-transform: uppercase;
-            font-size: 0.78rem;
-            letter-spacing: 1px;
-            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
-            transform: translateZ(25px);
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        .mobile-viewport::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.3);
+            border-radius: 10px;
         }
         
-        .badge-selected { background-color: var(--color-selected); box-shadow: 0 0 20px var(--glow-selected); }
-        .badge-shortlisted { background-color: var(--color-shortlisted); box-shadow: 0 0 20px var(--glow-shortlisted); }
-        .badge-maybe { background-color: var(--color-maybe); box-shadow: 0 0 20px var(--glow-maybe); }
-        .badge-rejected { background-color: var(--color-rejected); box-shadow: 0 0 20px var(--glow-rejected); }
-
-        .score-large {
-            font-size: 3rem;
-            font-weight: 900;
-            margin: 12px 0 2px 0;
-            background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transform: translateZ(35px);
-            letter-spacing: -1px;
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .sub-txt {
-            transform: translateZ(20px);
-            color: var(--text-muted); 
-            margin: 0; 
-            font-size: 0.8rem;
-        }
-
-        .chart-box img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            margin-top: 10px;
-            transform: translateZ(20px);
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .list-section h3 {
-            font-size: 0.95rem;
-            margin: 18px 0 8px 0;
-            color: #cbd5e1;
-            transform: translateZ(15px);
-        }
-
-        .list-section ul {
-            padding-left: 18px;
-            margin: 0;
-            transform: translateZ(15px);
-        }
-
-        .list-section li {
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .btn-back {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.78rem;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .btn-back:hover {
-            background: #ffffff;
-            color: #000000;
-        }
+        /* 3D Parallax Depth for Children elements inside results */
+        .depth-title { transform: translateZ(25px); }
+        .depth-badge { transform: translateZ(30px); }
+        .depth-score { transform: translateZ(35px); }
+        .depth-content { transform: translateZ(15px); }
     </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen flex items-center justify-center p-4 perspective-container">
 
-<!-- High-Tech Mobile device mock wrapper active on desktops -->
-<div class="mobile-device-frame">
-    <div class="container">
-        <!-- Dashboard Header -->
-        <div class="header">
-            <div>
-                <h1>Screening Report</h1>
-                <div class="meta-time">Processed in {{ execution_time }}</div>
+    <!-- Outer Device Hardware Shell (Exact dimension & styling clone from index.html) -->
+    <div class="3d-card relative mx-auto w-[380px] h-[780px] bg-slate-950 rounded-[48px] p-3.5 shadow-[0_25px_60px_rgba(0,0,0,0.8),_inset_0_2px_4px_rgba(255,255,255,0.2)] border border-slate-800/80 hover:scale-[1.02] hover:shadow-[0_35px_70px_rgba(99,102,241,0.25)]">
+        
+        <!-- Top Speaker Notch and Camera Island Component -->
+        <div class="absolute top-6 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-950 rounded-full z-30 flex items-center justify-center gap-1.5 shadow-inner">
+            <div class="w-3 h-3 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center">
+                <div class="w-1 h-1 rounded-full bg-indigo-950"></div>
             </div>
-            <div>
-                <a href="{{ url_for('index') }}" class="btn-back">← New Scan</a>
-            </div>
+            <div class="w-12 h-1 rounded-full bg-slate-800"></div>
         </div>
 
-        <div class="grid">
+        <!-- Inner Mobile Screen Viewport Boundary (Matching background, layout, & rules) -->
+        <div class="mobile-viewport relative w-full h-full bg-slate-50 rounded-[36px] overflow-y-auto overflow-x-hidden flex flex-col pt-10 pb-6 px-5 border border-slate-950 gap-4">
             
-            <!-- 1. System Decision Card (Moved up for prominent mobile-first positioning) -->
-            <div class="card-perspective">
-                <div class="card decision-panel">
-                    <h2>
-                        <div class="icon-container-3d">
-                            <div class="icon-decision"></div>
-                        </div>
-                        System Decision
-                    </h2>
-                    <div style="margin: 10px 0; transform: translateZ(20px);">
-                        <span class="badge 
-                            {% if evaluation['Decision'] == 'SELECTED' %}badge-selected
-                            {% elif evaluation['Decision'] == 'SHORTLISTED' %}badge-shortlisted
-                            {% elif evaluation['Decision'] == 'MAYBE' %}badge-maybe
-                            {% else %}badge-rejected{% endif %}">
+            <!-- Dashboard Header Section -->
+            <div class="flex items-center justify-between border-b border-slate-200 pb-4 mt-2 shrink-0">
+                <div>
+                    <h1 class="text-lg font-extrabold text-slate-950 tracking-tight">Screening Report</h1>
+                    <p class="text-[10px] text-slate-400 font-medium">Processed in {{ execution_time }}</p>
+                </div>
+                <a href="{{ url_for('index') }}" class="inline-flex items-center justify-center py-2 px-3 bg-slate-200/80 hover:bg-slate-950 hover:text-white text-slate-800 font-bold rounded-xl transition-all text-[11px] tracking-wide shadow-sm">
+                    ← New Scan
+                </a>
+            </div>
+
+            <!-- Dashboard Content Stream -->
+            <div class="flex flex-col gap-4 flex-1">
+                
+                <!-- 1. System Decision Card -->
+                <div class="bg-white border border-slate-200/60 shadow-[0_4px_20px_rgba(0,0,0,0.03)] rounded-2xl p-4 text-center flex flex-col items-center justify-center transform-gpu transition-transform duration-200 ease-out card-interactive" style="transform-style: preserve-3d;">
+                    <h2 class="depth-title text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">System Decision</h2>
+                    
+                    <div class="depth-badge mb-2">
+                        <span class="inline-block px-3 py-1 font-extrabold text-[10px] tracking-widest text-white rounded-full uppercase shadow-sm
+                            {% if evaluation['Decision'] == 'SELECTED' %} bg-emerald-500 shadow-emerald-200
+                            {% elif evaluation['Decision'] == 'SHORTLISTED' %} bg-blue-500 shadow-blue-200
+                            {% elif evaluation['Decision'] == 'MAYBE' %} bg-amber-500 shadow-amber-200
+                            {% else %} bg-rose-500 shadow-rose-200 {% endif %}">
                             {{ evaluation['Decision'] }}
                         </span>
                     </div>
-                    <div class="score-large">{{ evaluation['Overall Score'] }}%</div>
-                    <p class="sub-txt">Composite Matching Matrix Score</p>
+                    
+                    <div class="depth-score text-4xl font-black text-slate-950 tracking-tighter">{{ evaluation['Overall Score'] }}%</div>
+                    <p class="depth-content text-[10px] text-slate-400 font-medium mt-1">Composite Matching Matrix Score</p>
                 </div>
-            </div>
 
-            <!-- 2. Candidate Profile Card -->
-            <div class="card-perspective">
-                <div class="card profile-info">
-                    <h2>
-                        <div class="icon-container-3d icon-profile">
-                            <div class="layer layer-1"></div>
-                            <div class="layer layer-2"></div>
-                            <div class="layer layer-3"></div>
-                        </div>
+                <!-- 2. Candidate Profile Card -->
+                <div class="bg-white border border-slate-200/60 shadow-[0_4px_20px_rgba(0,0,0,0.03)] rounded-2xl p-4 transform-gpu transition-transform duration-200 ease-out card-interactive" style="transform-style: preserve-3d;">
+                    <h2 class="depth-title text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                         Candidate Profile
                     </h2>
-                    <p><strong>Full Name:</strong><span class="val">{{ details['Name'] }}</span></p>
-                    <p><strong>Email:</strong><span class="val">{{ details['Email'] }}</span></p>
-                    <p><strong>Phone:</strong><span class="val">{{ details['Phone'] }}</span></p>
+                    <div class="depth-content space-y-2 text-xs">
+                        <p class="flex flex-col border-b border-slate-100 pb-1.5"><strong class="text-[10px] uppercase text-slate-400 font-bold tracking-wide">Full Name</strong><span class="text-slate-900 font-semibold mt-0.5">{{ details['Name'] }}</span></p>
+                        <p class="flex flex-col border-b border-slate-100 pb-1.5"><strong class="text-[10px] uppercase text-slate-400 font-bold tracking-wide">Email</strong><span class="text-slate-900 font-semibold mt-0.5 break-all">{{ details['Email'] }}</span></p>
+                        <p class="flex flex-col border-b border-slate-100 pb-1.5"><strong class="text-[10px] uppercase text-slate-400 font-bold tracking-wide">Phone</strong><span class="text-slate-900 font-semibold mt-0.5">{{ details['Phone'] }}</span></p>
+                    </div>
                     
-                    <h3>Detected Core Skills</h3>
-                    <div class="skills-container">
+                    <h3 class="depth-title text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-4 mb-2">Detected Core Skills</h3>
+                    <div class="depth-content flex flex-wrap gap-1.5">
                         {% for skill in details['Skills'] %}
-                            <span class="skill-tag">{{ skill }}</span>
+                            <span class="bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">{{ skill }}</span>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
 
-            <!-- 3. Metrics Chart Panel -->
-            <div class="card-perspective">
-                <div class="card chart-box">
-                    <h2>
-                        <div class="icon-container-3d icon-charts">
-                            <div class="bar bar-1"></div>
-                            <div class="bar bar-2"></div>
-                            <div class="bar bar-3"></div>
-                        </div>
+                <!-- 3. Metrics Chart Panel -->
+                <div class="bg-white border border-slate-200/60 shadow-[0_4px_20px_rgba(0,0,0,0.03)] rounded-2xl p-4 transform-gpu transition-transform duration-200 ease-out card-interactive" style="transform-style: preserve-3d;">
+                    <h2 class="depth-title text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" /></svg>
                         Metrics Profile
                     </h2>
-                    {% if plot_url %}
-                        <img src="data:image/png;base64,{{ plot_url }}" alt="Metrics Breakdown Chart">
-                    {% else %}
-                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px); font-size: 0.85rem;">Performance matrix graph could not load.</p>
-                    {% endif %}
+                    <div class="depth-content mt-2 flex items-center justify-center">
+                        {% if plot_url %}
+                            <img src="data:image/png;base64,{{ plot_url }}" alt="Metrics Breakdown Chart" class="w-full h-auto rounded-xl border border-slate-200/80 shadow-inner">
+                        {% else %}
+                            <p class="text-slate-400 text-xs italic py-4 text-center w-full">Performance matrix graph could not load.</p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
 
-            <!-- 4. Extracted Background Card -->
-            <div class="card-perspective">
-                <div class="card list-section">
-                    <h2>
-                        <div class="icon-container-3d icon-database">
-                            <div class="disk disk-1"></div>
-                            <div class="disk disk-2"></div>
-                            <div class="disk disk-3"></div>
-                        </div>
+                <!-- 4. Extracted Background Card -->
+                <div class="bg-white border border-slate-200/60 shadow-[0_4px_20px_rgba(0,0,0,0.03)] rounded-2xl p-4 transform-gpu transition-transform duration-200 ease-out card-interactive" style="transform-style: preserve-3d;">
+                    <h2 class="depth-title text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
                         Extracted Background
                     </h2>
                     
-                    <h3>Education Indicators</h3>
-                    {% if evaluation['Education'] %}
-                        <ul>
-                            {% for edu in evaluation['Education'] %}
-                                <li>{{ edu }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px); font-size: 0.85rem;">No specific degree/university matching keywords isolated.</p>
-                    {% endif %}
+                    <div class="depth-content space-y-3">
+                        <div>
+                            <h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Education Indicators</h3>
+                            {% if evaluation['Education'] %}
+                                <ul class="list-disc pl-4 text-xs text-slate-700 font-medium space-y-1">
+                                    {% for edu in evaluation['Education'] %}
+                                        <li>{{ edu }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-slate-400 text-xs italic">No specific isolated education keywords.</p>
+                            {% endif %}
+                        </div>
 
-                    <h3>Project Reference Keywords</h3>
-                    {% if evaluation['Projects'] %}
-                        <ul>
-                            {% for proj in evaluation['Projects'] %}
-                                <li>{{ proj }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p style="color: var(--text-muted); font-style: italic; transform: translateZ(15px); font-size: 0.85rem;">No specific project milestones isolated.</p>
-                    {% endif %}
+                        <div class="pt-2 border-t border-slate-100">
+                            <h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Project Reference Keywords</h3>
+                            {% if evaluation['Projects'] %}
+                                <ul class="list-disc pl-4 text-xs text-slate-700 font-medium space-y-1">
+                                    {% for proj in evaluation['Projects'] %}
+                                        <li>{{ proj }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-slate-400 text-xs italic">No specific isolated project milestones.</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
 
+            </div>
+            
+            <!-- Bottom UI Soft Home Indicator Bar (Exact structural placement match) -->
+            <div class="w-28 h-1 bg-slate-200 rounded-full mx-auto mt-2 shrink-0"></div>
         </div>
     </div>
-</div>
 
-<script>
-    // Premium Interactive 3D Parallax Tracking Functionality (with Touch adaptation)
-    document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('mousemove', e => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left; // x coordinate inside the element.
-            const y = e.clientY - rect.top;  // y coordinate inside the element.
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            // Subtle tilt dynamic logic
-            const rotateX = ((centerY - y) / centerY) * 10; 
-            const rotateY = ((x - centerX) / centerX) * 10;
-            
-            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(15px)`;
-        });
+    <!-- Enhanced Parallax Script targeting the new fluid layout structures -->
+    <script>
+        document.querySelectorAll('.card-interactive').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((centerY - y) / centerY) * 8; 
+                const rotateY = ((x - centerX) / centerX) * 8;
+                
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+            });
 
-        card.addEventListener('mouseleave', () => {
-            // Smooth snap back to default layout axis
-            card.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(0px)';
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(0px)';
+            });
         });
-    });
-</script>
+    </script>
 
 </body>
 </html>
