@@ -1,17 +1,18 @@
-const CACHE_NAME = 'smartscreen-ai-v1';
+const CACHE_NAME = 'smartscreen-ai-v2'; // Incremented version to force update
+const OFFLINE_URL = '/static/offline.html';
+
 const ASSETS_TO_CACHE = [
   '/',
   '/index',
   '/static/manifest.json',
-  // Add your CSS/JS paths here if you have separate local files, e.g.:
-  // '/static/css/style.css'
+  OFFLINE_URL
 ];
 
-// Install Event: Cache essential assets
+// Install Event: Cache essential assets & offline page
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching shell assets');
+      console.log('Caching shell assets and offline page');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
@@ -35,13 +36,21 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch Event: Serve cached assets when offline, otherwise fetch from network
+// Fetch Event: Network-first, fallback to cache, fallback to offline page
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).catch(() => {
-        // Fallback or offline behavior if the network fails
-      });
-    })
-  );
+  // Only handle document/page navigation requests for the offline fallback
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match(OFFLINE_URL);
+      })
+    );
+  } else {
+    // For other assets (images, CSS), try cache first, fallback to network
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        return cachedResponse || fetch(event.request);
+      })
+    );
+  }
 });
