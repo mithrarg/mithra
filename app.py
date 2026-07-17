@@ -7,7 +7,7 @@ import spacy
 import pdfplumber
 import docx
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, send_from_directory
 
 # Force Matplotlib to use a headless background engine (Required for Render/Linux server environments)
 import matplotlib
@@ -121,6 +121,22 @@ def welcome():
 def index():
     """Renders the main upload visual device dashboard."""
     return render_template('index.html')
+
+# --- PWA Asset Routing Handlers ---
+
+@app.route('/manifest.json')
+def serve_manifest():
+    """Serves the manifest.json file directly from the static folder to support PWA setup."""
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'manifest.json')
+
+@app.route('/sw.js')
+def serve_sw():
+    """Serves the sw.js file with headers blocking aggressive browser caching to ensure updates deploy immediately."""
+    response = send_from_directory(os.path.join(app.root_path, 'static'), 'sw.js')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    return response
+
+# --- Core Processing Pipelines ---
 
 @app.route('/results', methods=['POST'])
 def results():
