@@ -1,0 +1,24 @@
+{
+  "name": "SmartScreen AI",
+  "short_name": "SmartScreen",
+  "description": "Deploy machine intelligence to analyze resume indicators, matrix profiles, and skill compatibility instantly.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
