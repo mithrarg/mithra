@@ -32,21 +32,21 @@
         .depth-content { transform: translateZ(15px); }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen flex items-center justify-center p-4 perspective-container">
+<body class="bg-slate-50 md:bg-gradient-to-br md:from-slate-900 md:via-indigo-950 md:to-slate-900 min-h-screen flex items-center justify-center p-0 md:p-4 perspective-container">
 
-    <!-- Outer Device Hardware Shell (Exact dimension & styling clone from index.html) -->
-    <div class="3d-card relative mx-auto w-[380px] h-[780px] bg-slate-950 rounded-[48px] p-3.5 shadow-[0_25px_60px_rgba(0,0,0,0.8),_inset_0_2px_4px_rgba(255,255,255,0.2)] border border-slate-800/80 hover:scale-[1.02] hover:shadow-[0_35px_70px_rgba(99,102,241,0.25)]">
+    <!-- Outer Device Hardware Shell (Frame hidden on mobile, visible on desktop) -->
+    <div class="3d-card relative mx-auto w-full min-h-screen md:min-h-0 md:w-[380px] md:h-[780px] bg-slate-50 md:bg-slate-950 md:rounded-[48px] p-0 md:p-3.5 md:shadow-[0_25px_60px_rgba(0,0,0,0.8),_inset_0_2px_4px_rgba(255,255,255,0.2)] md:border md:border-slate-800/80 md:hover:scale-[1.02] md:hover:shadow-[0_35px_70px_rgba(99,102,241,0.25)]">
         
-        <!-- Top Speaker Notch and Camera Island Component -->
-        <div class="absolute top-6 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-950 rounded-full z-30 flex items-center justify-center gap-1.5 shadow-inner">
+        <!-- Top Speaker Notch and Camera Island Component (Desktop Only) -->
+        <div class="hidden md:flex absolute top-6 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-950 rounded-full z-30 items-center justify-center gap-1.5 shadow-inner">
             <div class="w-3 h-3 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center">
                 <div class="w-1 h-1 rounded-full bg-indigo-950"></div>
             </div>
             <div class="w-12 h-1 rounded-full bg-slate-800"></div>
         </div>
 
-        <!-- Inner Mobile Screen Viewport Boundary (Matching background, layout, & rules) -->
-        <div class="mobile-viewport relative w-full h-full bg-slate-50 rounded-[36px] overflow-y-auto overflow-x-hidden flex flex-col pt-10 pb-6 px-5 border border-slate-950 gap-4">
+        <!-- Inner Screen Viewport Boundary -->
+        <div class="mobile-viewport relative w-full h-full bg-slate-50 rounded-none md:rounded-[36px] overflow-y-auto overflow-x-hidden flex flex-col pt-4 md:pt-10 pb-6 px-4 md:px-5 border-0 md:border md:border-slate-950 gap-4">
             
             <!-- Dashboard Header Section -->
             <div class="flex items-center justify-between border-b border-slate-200 pb-4 mt-2 shrink-0">
@@ -153,15 +153,18 @@
 
             </div>
             
-            <!-- Bottom UI Soft Home Indicator Bar (Exact structural placement match) -->
-            <div class="w-28 h-1 bg-slate-200 rounded-full mx-auto mt-2 shrink-0"></div>
+            <!-- Bottom UI Soft Home Indicator Bar (Desktop Mockup Only) -->
+            <div class="hidden md:block w-28 h-1 bg-slate-200 rounded-full mx-auto mt-2 shrink-0"></div>
         </div>
     </div>
 
-    <!-- Enhanced Parallax Script targeting the new fluid layout structures -->
+    <!-- Parallax Script (Active on Mouse Hover for Desktop) -->
     <script>
         document.querySelectorAll('.card-interactive').forEach(card => {
             card.addEventListener('mousemove', e => {
+                // Disable tilt effect on mobile viewports
+                if (window.innerWidth < 768) return;
+
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
