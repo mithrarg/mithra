@@ -11,7 +11,7 @@
         .perspective-container {
             perspective: 1000px;
         }
-        .3d-card {
+        .three-d-card {
             transform-style: preserve-3d;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
         }
@@ -31,7 +31,7 @@
 <body class="bg-white md:bg-gradient-to-br md:from-slate-900 md:via-indigo-950 md:to-slate-900 min-h-screen flex items-center justify-center p-0 md:p-4 perspective-container">
 
     <!-- Outer Device Hardware Shell (Frame only shows on md: screens and up) -->
-    <div class="3d-card relative mx-auto w-full min-h-screen md:min-h-0 md:w-[380px] md:h-[780px] bg-white md:bg-slate-950 md:rounded-[48px] p-0 md:p-3.5 md:shadow-[0_25px_60px_rgba(0,0,0,0.8),_inset_0_2px_4px_rgba(255,255,255,0.2)] md:border md:border-slate-800/80 md:hover:scale-[1.02] md:hover:shadow-[0_35px_70px_rgba(99,102,241,0.25)]">
+    <div class="three-d-card relative mx-auto w-full min-h-screen md:min-h-0 md:w-[380px] md:h-[780px] bg-white md:bg-slate-950 md:rounded-[48px] p-0 md:p-3.5 md:shadow-[0_25px_60px_rgba(0,0,0,0.8),_inset_0_2px_4px_rgba(255,255,255,0.2)] md:border md:border-slate-800/80 md:hover:scale-[1.02] md:hover:shadow-[0_35px_70px_rgba(99,102,241,0.25)] flex flex-col">
         
         <!-- Top Speaker Notch and Camera Island (Hidden on Mobile, Visible on Desktop) -->
         <div class="hidden md:flex absolute top-6 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-950 rounded-full z-30 items-center justify-center gap-1.5 shadow-inner">
@@ -42,7 +42,7 @@
         </div>
 
         <!-- Inner Screen Viewport Boundary -->
-        <div class="mobile-viewport relative w-full h-full bg-white rounded-none md:rounded-[36px] overflow-y-auto overflow-x-hidden flex flex-col pt-6 md:pt-10 pb-6 px-5 border-0 md:border md:border-slate-950">
+        <div class="mobile-viewport relative w-full h-full bg-white rounded-none md:rounded-[36px] overflow-y-auto overflow-x-hidden flex flex-col pt-6 md:pt-10 pb-6 px-5 border-0 md:border md:border-slate-950 flex-1">
             
             <!-- Header Section with 3D Styled Logo Mark -->
             <div class="text-center mb-6 mt-2">
@@ -74,18 +74,6 @@
             <form action="/results" method="POST" enctype="multipart/form-data" class="space-y-5 flex-1 flex flex-col justify-between">
                 
                 <div class="space-y-5">
-                    <!-- Job Description Field Section -->
-                    <div class="group">
-                        <label for="job_description" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1.5 group-focus-within:text-indigo-600 transition-colors">Target Job Description</label>
-                        <textarea 
-                            name="job_description" 
-                            id="job_description" 
-                            rows="4" 
-                            placeholder="Paste requirements or expected target keywords here..."
-                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all resize-none shadow-inner"
-                        >{% if request.form.get('job_description') %}{{ request.form.get('job_description') }}{% endif %}</textarea>
-                    </div>
-
                     <!-- Custom Interactive File Upload Component Zone -->
                     <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1.5">Upload Candidate Resume</label>
@@ -99,10 +87,10 @@
                                 class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                 onchange="updateFilename(this)"
                             />
-                            <div class="p-5 text-center pointer-events-none transition-transform duration-300 group-hover/upload:scale-[1.01]">
+                            <div class="p-8 text-center pointer-events-none transition-transform duration-300 group-hover/upload:scale-[1.01]">
                                 <!-- 3D Layered Cloud Icon Construct -->
-                                <div class="relative w-10 h-10 mx-auto mb-2 filter drop-shadow-[0_6px_10px_rgba(99,102,241,0.25)]">
-                                    <svg class="text-indigo-500 w-10 h-10 transition-transform duration-300 group-hover/upload:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <div class="relative w-12 h-12 mx-auto mb-3 filter drop-shadow-[0_6px_10px_rgba(99,102,241,0.25)]">
+                                    <svg class="text-indigo-500 w-12 h-12 transition-transform duration-300 group-hover/upload:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                     </svg>
                                 </div>
@@ -119,7 +107,7 @@
                 <div class="pt-4 mt-auto">
                     <button 
                         type="submit" 
-                        class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-xl shadow-[0_4px_12px_rgba(99,102,241,0.35)] hover:shadow-[0_6px_20px_rgba(99,102,241,0.45)] transition-all duration-300 active:scale-[0.97] transform cursor-pointer text-center tracking-wide text-xs"
+                        class="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-xl shadow-[0_4px_12px_rgba(99,102,241,0.35)] hover:shadow-[0_6px_20px_rgba(99,102,241,0.45)] transition-all duration-300 active:scale-[0.97] transform cursor-pointer text-center tracking-wide text-xs uppercase"
                     >
                         Run Evaluation Pipeline
                     </button>
