@@ -117,7 +117,7 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen flex items-center justify-center p-4 perspective-container overflow-hidden">
+<body class="bg-slate-50 md:bg-gradient-to-br md:from-slate-900 md:via-indigo-950 md:to-slate-900 min-h-screen flex items-center justify-center p-0 md:p-4 perspective-container overflow-x-hidden">
 
     <!-- ==========================================
        PWA Install Overlay Modal
@@ -140,12 +140,12 @@
     </div>
 
     <!-- ==========================================
-       Outer Device Hardware Frame
+       Outer Device Hardware Frame (Hidden on Mobile, Visible on Desktop)
        ========================================== -->
-    <div id="device-frame" class="three-d-card relative mx-auto w-[380px] h-[780px] bg-slate-950 rounded-[48px] p-3.5 shadow-[0_25px_60px_rgba(0,0,0,0.8),_inset_0_2px_4px_rgba(255,255,255,0.2)] border border-slate-800/80 hover:shadow-[0_35px_70px_rgba(99,102,241,0.25)]">
+    <div id="device-frame" class="three-d-card relative mx-auto w-full min-h-screen md:min-h-0 md:w-[380px] md:h-[780px] bg-slate-50 md:bg-slate-950 md:rounded-[48px] p-0 md:p-3.5 md:shadow-[0_25px_60px_rgba(0,0,0,0.8),_inset_0_2px_4px_rgba(255,255,255,0.2)] md:border md:border-slate-800/80 md:hover:shadow-[0_35px_70px_rgba(99,102,241,0.25)] flex flex-col">
         
-        <!-- Top Speaker Notch and Camera Island Component -->
-        <div class="absolute top-6 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-950 rounded-full z-30 flex items-center justify-center gap-1.5 shadow-inner">
+        <!-- Top Speaker Notch and Camera Island Component (Desktop Only) -->
+        <div class="hidden md:flex absolute top-6 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-950 rounded-full z-30 items-center justify-center gap-1.5 shadow-inner">
             <div class="w-3 h-3 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center">
                 <div class="w-1 h-1 rounded-full bg-indigo-950"></div>
             </div>
@@ -153,7 +153,7 @@
         </div>
 
         <!-- Inner Mobile Screen Viewport -->
-        <div class="mobile-viewport relative w-full h-full bg-slate-50 rounded-[36px] overflow-y-auto overflow-x-hidden flex flex-col justify-between pt-24 pb-6 px-6 border border-slate-950" style="transform-style: preserve-3d;">
+        <div class="mobile-viewport relative w-full h-full bg-slate-50 rounded-none md:rounded-[36px] overflow-y-auto overflow-x-hidden flex flex-col justify-between pt-12 md:pt-24 pb-6 px-6 border-0 md:border md:border-slate-950 flex-1" style="transform-style: preserve-3d;">
             
             <!-- Graphic/Branding Area -->
             <div class="flex flex-col items-center text-center my-auto space-y-8" style="transform-style: preserve-3d;">
@@ -181,8 +181,8 @@
                     Get Started
                 </a>
                 
-                <!-- Bottom UI Soft Home Indicator Bar -->
-                <div class="w-28 h-1 bg-slate-200 rounded-full mx-auto mt-4 shrink-0"></div>
+                <!-- Bottom UI Soft Home Indicator Bar (Desktop Mockup Only) -->
+                <div class="hidden md:block w-28 h-1 bg-slate-200 rounded-full mx-auto mt-4 shrink-0"></div>
             </div>
             
         </div>
@@ -286,12 +286,15 @@
         })();
     </script>
 
-    <!-- Script 3: 3D Device Framing Hover Effect -->
+    <!-- Script 3: 3D Device Framing Hover Effect (Desktop Only) -->
     <script>
         (() => {
             const frame = document.getElementById('device-frame');
             
             document.body.addEventListener('mousemove', (e) => {
+                // Skip 3D tilt effect on mobile viewports
+                if (window.innerWidth < 768) return;
+
                 const windowWidth = window.innerWidth;
                 const windowHeight = window.innerHeight;
                 
@@ -305,6 +308,7 @@
             });
 
             document.body.addEventListener('mouseleave', () => {
+                if (window.innerWidth < 768) return;
                 frame.style.transform = 'rotateX(0deg) rotateY(0deg)';
             });
         })();
