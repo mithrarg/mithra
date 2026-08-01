@@ -24,18 +24,20 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
-    nlp = spacy.blank("en") if spacy else None
+    nlp = spacy.blank("en") if 'spacy' in globals() else None
 
 class ResumeParserEngine:
     def extract_text(self, file):
         fn = file.filename.lower()
+        file.seek(0)  # Ensure read pointer starts at zero
         stream = io.BytesIO(file.read())
+        
         if fn.endswith(".pdf"):
             with pdfplumber.open(stream) as pdf:
                 return "".join([p.extract_text() or "" for p in pdf.pages])
         elif fn.endswith((".docx", ".doc")):
             return "".join([p.text + "\n" for p in docx.Document(stream).paragraphs])
-        raise ValueError("Unsupported format. Use PDF or DOCX.")
+        raise ValueError("Unsupported format. Please upload a PDF or DOCX file.")
 
     def parse_profile(self, text):
         clean = re.sub(r'\s+', ' ', text).strip()
@@ -79,7 +81,7 @@ class ATSEngine:
         try:
             matrix = CountVectorizer().fit_transform([self.r_text, self.jd_text])
             sim_score = cosine_similarity(matrix)[0][1] * 100
-        except: 
+        except Exception: 
             sim_score = 0
         
         ats = round((match_pct * 0.6) + (sim_score * 0.4), 2)
@@ -87,8 +89,8 @@ class ATSEngine:
 
 def evaluate_candidate(raw_text, profile, ats_report):
     lines = raw_text.splitlines()
-    edu = [l.strip() for l in lines if any(k in l.lower() for k in ["university", "college", "degree", "bachelor", "master"])][:4]
-    proj = [l.strip() for l in lines if any(k in l.lower() for k in ["project", "developed", "system", "built"])][:4]
+    edu = [l.strip() for l in lines if any(k in l.lower() for k in ["university", "college", "degree", "bachelor", "master"])] [:4]
+    proj = [l.strip() for l in lines if any(k in l.lower() for k in ["project", "developed", "system", "built"])] [:4]
     
     s_score = min(30, max(5, len(profile["Skills"]) * 3))
     e_score = 12
@@ -108,7 +110,14 @@ def evaluate_candidate(raw_text, profile, ats_report):
     overall = round((ats_report["ATS Score"] * 0.6) + (r_score * 0.4), 2)
     
     status = "SELECTED" if overall >= 85 else ("SHORTLISTED" if overall >= 70 else ("MAYBE" if overall >= 55 else "REJECTED"))
-    return {"Resume Score": r_score, "ATS Score": ats_report["ATS Score"], "Overall Score": overall, "Decision": status, "Education": edu, "Projects": proj}
+    return {
+        "Resume Score": r_score, 
+        "ATS Score": ats_report["ATS Score"], 
+        "Overall Score": overall, 
+        "Decision": status, 
+        "Education": edu, 
+        "Projects": proj
+    }
 
 # --- Core Routing Setup ---
 
